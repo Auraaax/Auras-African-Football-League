@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Aura's African Football League</title>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background with African football theme -->
+    <div class="background-overlay"></div>
+    
+    <!-- Main Login Container -->
+    <div class="login-container">
+        <!-- League Logo and Title -->
+        <header class="login-header">
+            <h1 class="league-logo">Aura's African Football League</h1>
+            <p class="welcome-message">Welcome Back!</p>
+            <p class="subtitle">Continue your football journey with us</p>
+        </header>
+
+        <!-- Login Form -->
+        <main class="login-main">
+            <form id="loginForm" class="login-form">
+                <!-- Email/Username Input -->
+                <div class="form-group">
+                    <label for="email">Email or Username</label>
+                    <div class="input-container">
+                        <input type="text" id="email" name="email" required>
+                        <span class="input-icon">✉</span>
+                    </div>
+                    <span class="error-message" id="email-error"></span>
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-container">
+                        <input type="password" id="password" name="password" required>
+                        <span class="input-icon">🔒</span>
+                    </div>
+                    <span class="error-message" id="password-error"></span>
+                </div>
+
+                <!-- User Type Selection -->
+                <div class="form-group">
+                    <label for="userType">Login as</label>
+                    <div class="select-container">
+                        <select id="userType" name="userType" required>
+                            <option value="">Select your role</option>
+                            <option value="administrator">Administrator</option>
+                            <option value="federation">Federation</option>
+                            <option value="visitor">Visitor</option>
+                        </select>
+                        <span class="select-arrow">▼</span>
+                    </div>
+                    <span class="error-message" id="role-error"></span>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Login</span>
+                    <span class="btn-loader hidden">⏳</span>
+                </button>
+
+                <!-- Error Message Display -->
+                <div id="login-error" class="error-message global-error hidden">
+                    Incorrect email, password, or user type.
+                </div>
+            </form>
+
+            <!-- Registration Link -->
+            <div class="register-link">
+                <p>Don't have an account? <a href="index.html" class="register-cta">Register here</a></p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="login-footer">
+            <p>&copy; Aura's African Football League. Celebrating African Football Excellence.</p>
+        </footer>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

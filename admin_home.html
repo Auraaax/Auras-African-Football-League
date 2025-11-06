@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="logo">Aura's African Football League</div>
+        <div class="tagline">Administrator Dashboard</div>
+      </header>
+      <main class="main-content">
+        <h2>Welcome, Administrator</h2>
+        <p>This is a placeholder admin dashboard. Add admin features here.</p>
+        <button id="logout">Logout</button>
+      </main>
+    </div>
+    <script>
+      document.getElementById('logout').addEventListener('click', () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
+      });
+    </script>
+  </body>
+</html>

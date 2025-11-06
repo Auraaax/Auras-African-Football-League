@@ -1,0 +1,5 @@
+# Ignore local JDK bundle accidentally copied into repo
+oracleJdk-25.jdk/
+
+# macOS and editor artifacts
+.DS_Store

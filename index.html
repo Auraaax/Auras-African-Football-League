@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura's African Football League</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">Aura's African Football League</h1>
+            <p class="tagline">Celebrating African Football Excellence</p>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container">
+            <!-- User Role Selection -->
+            <section class="role-selection">
+                <h2>Join the African Football Community</h2>
+                <p>Select your role to get started</p>
+                
+                <div class="role-buttons">
+                    <button class="role-btn" data-role="administrator">Administrator</button>
+                    <button class="role-btn" data-role="federation">Federation</button>
+                    <button class="role-btn" data-role="visitor">Visitor</button>
+                </div>
+            </section>
+
+            <!-- Forms Section -->
+            <section class="forms-section">
+                <!-- Administrator Form -->
+                <div id="admin-form" class="form-container hidden">
+                    <h3>Administrator Registration</h3>
+                    <form id="adminRegistration" class="registration-form">
+                        <div class="form-group">
+                            <label for="admin-name">Full Name</label>
+                            <input type="text" id="admin-name" name="name" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-email">Email</label>
+                            <input type="email" id="admin-email" name="email" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-password">Password</label>
+                            <input type="password" id="admin-password" name="password" minlength="6" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-code">Administrator Code</label>
+                            <input type="text" id="admin-code" name="adminCode" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="submit" class="submit-btn">Register as Administrator</button>
+                    </form>
+                </div>
+
+                <!-- Federation Form -->
+                <div id="federation-form" class="form-container hidden">
+                    <h3>Federation Registration</h3>
+                    <form id="federationRegistration" class="registration-form">
+                        <div class="form-group">
+                            <label for="federation-name">Federation Name</label>
+                            <input type="text" id="federation-name" name="federationName" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="federation-email">Email</label>
+                            <input type="email" id="federation-email" name="email" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="federation-password">Password</label>
+                            <input type="password" id="federation-password" name="password" minlength="6" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="federation-country">Country</label>
+                            <input type="text" id="federation-country" name="country" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="submit" class="submit-btn">Register Federation</button>
+                    </form>
+                </div>
+
+                <!-- Visitor Form -->
+                <div id="visitor-form" class="form-container hidden">
+                    <h3>Visitor Registration</h3>
+                    <form id="visitorRegistration" class="registration-form">
+                        <div class="form-group">
+                            <label for="visitor-name">Full Name</label>
+                            <input type="text" id="visitor-name" name="name" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="visitor-email">Email</label>
+                            <input type="email" id="visitor-email" name="email" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="visitor-password">Password</label>
+                            <input type="password" id="visitor-password" name="password" minlength="6" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="visitor-country">Country of Residence</label>
+                            <input type="text" id="visitor-country" name="country" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="submit" class="submit-btn">Register as Visitor</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Success Message Section -->
+            <section id="success-message" class="success-message hidden">
+                <div class="success-content">
+                    <h2>Welcome to Aura's African Football League!</h2>
+                    <p>Your registration was successful. You're now part of Africa's premier football community.</p>
+                    <button id="back-to-home" class="submit-btn">Back to Home</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Aura's African Football League. Celebrating African Football Excellence.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
