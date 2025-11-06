@@ -3,3 +3,12 @@ oracleJdk-25.jdk/
 
 # macOS and editor artifacts
 .DS_Store
+
+# Node / npm
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Local runtime logs and environment
+server.log
+.env
