@@ -138,11 +138,213 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupNav();
   document.getElementById('simulateForm').addEventListener('submit', simulateMatch);
   document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('restartTournamentBtn')?.addEventListener('click', restartTournament);
+  
   await loadDashboard();
   await loadTeams();
   await loadMatches();
   await loadLeaderboard();
+  await loadTournamentStatus();
 });
+
+// Tournament Functions
+async function loadTournamentStatus() {
+  try {
+    const res = await fetch(`${baseURL}/tournament/status`);
+    const status = await res.json();
+    
+    const statusDiv = document.getElementById('tournamentStatus');
+    
+    if (!status.canStart) {
+      statusDiv.innerHTML = `
+        <p style="color:#e63946;">⏳ Waiting for 8 registered teams to begin tournament...</p>
+        <p>Current teams: ${status.teamCount} / 8</p>
+      `;
+      return;
+    }
+    
+    let statusText = '';
+    if (status.status === 'not_started') {
+      statusText = '<p style="color:#2a9d8f;">✅ Tournament ready to start! Begin with Quarterfinals below.</p>';
+    } else if (status.status === 'quarterfinals') {
+      statusText = `<p style="color:#d4af37;">🏃 Quarterfinals in progress (${status.quarterfinalsPlayed}/4 completed)</p>`;
+    } else if (status.status === 'semifinals') {
+      statusText = `<p style="color:#d4af37;">🏃 Semifinals in progress (${status.semifinalsPlayed}/2 completed)</p>`;
+    } else if (status.status === 'completed') {
+      statusText = '<p style="color:#2a9d8f;">🏆 Tournament Complete! Check the Final result below.</p>';
+    }
+    
+    statusDiv.innerHTML = statusText;
+    
+    // Load matches for each round
+    await loadRoundMatches('Quarterfinal', 'quarterfinalsMatches');
+    await loadRoundMatches('Semifinal', 'semifinalsMatches');
+    await loadRoundMatches('Final', 'finalMatch');
+    
+  } catch (err) {
+    console.error('Failed to load tournament status:', err);
+  }
+}
+
+async function loadRoundMatches(round, containerId) {
+  try {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Check if matches exist for this round
+    const res = await fetch(`${baseURL}/tournament/matches/${round}`);
+    const matches = await res.json();
+    
+    if (matches.length > 0) {
+      // Display completed matches
+      container.innerHTML = matches.map(m => `
+        <div class="match-card">
+          <div class="match-teams">${m.teamA} vs ${m.teamB}</div>
+          <div class="match-score">${m.scoreA} - ${m.scoreB}</div>
+          <div class="match-result">Winner: ${m.winner}</div>
+          ${m.resultType !== '90min' ? `<div style="font-size:.85rem;color:#aaa;">(${m.resultType})</div>` : ''}
+          ${m.goals && m.goals.length > 0 ? `
+            <div class="match-goals">
+              ${m.goals.map(g => `⚽ ${g.scorer} ${g.minute}'`).join('<br>')}
+            </div>
+          ` : ''}
+          ${m.commentary ? `
+            <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" 
+                    onclick="showCommentary('${m.commentary.replace(/'/g, "\\'")}')">
+              View Commentary
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+    } else if (round === 'Quarterfinal') {
+      // Show quarterfinal pairings with play/simulate buttons
+      const pairingsRes = await fetch(`${baseURL}/tournament/quarterfinals`);
+      const pairings = await pairingsRes.json();
+      
+      container.innerHTML = pairings.map((p, idx) => `
+        <div class="match-card">
+          <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+          <div class="match-actions">
+            <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
+              🎮 Play
+            </button>
+            <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
+              ⚡ Simulate
+            </button>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      // Need to complete previous round first
+      const prevRound = round === 'Semifinal' ? 'Quarterfinals' : 'Semifinals';
+      container.innerHTML = `<p style="text-align:center;color:#666;">Complete ${prevRound} first</p>`;
+    }
+  } catch (err) {
+    console.error(`Failed to load ${round} matches:`, err);
+  }
+}
+
+async function playMatch(teamAId, teamBId, round) {
+  try {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Playing...';
+    
+    const res = await fetch(`${baseURL}/tournament/play-match`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ teamAId, teamBId, round })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      alert(data.error || 'Failed to play match');
+      btn.disabled = false;
+      btn.textContent = '🎮 Play';
+      return;
+    }
+    
+    // Show commentary
+    if (data.match.commentary) {
+      showCommentary(data.match.commentary);
+    }
+    
+    // Reload tournament
+    await loadTournamentStatus();
+    confetti();
+    
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+async function quickSimulate(teamAId, teamBId, round) {
+  try {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Simulating...';
+    
+    const res = await fetch(`${baseURL}/tournament/simulate-match`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ teamAId, teamBId, round })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+      alert(data.error || 'Failed to simulate match');
+      btn.disabled = false;
+      btn.textContent = '⚡ Simulate';
+      return;
+    }
+    
+    // Show brief result
+    alert(`${data.match.teamA} ${data.match.scoreA} - ${data.match.scoreB} ${data.match.teamB}\nWinner: ${data.match.winner}`);
+    
+    // Reload tournament
+    await loadTournamentStatus();
+    confetti();
+    
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function showCommentary(text) {
+  const box = document.getElementById('matchCommentary');
+  const textDiv = document.getElementById('commentaryText');
+  textDiv.textContent = text;
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function restartTournament() {
+  if (!confirm('Are you sure you want to restart the tournament? All match data will be deleted.')) {
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${baseURL}/tournament/restart`, {
+      method: 'POST',
+      headers: authHeaders()
+    });
+    
+    const data = await res.json();
+    
+    if (res.ok) {
+      alert('Tournament reset to Quarterfinals');
+      await loadTournamentStatus();
+      await loadMatches();
+      await loadLeaderboard();
+    } else {
+      alert(data.error || 'Failed to restart tournament');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
 
 // little pop animation
 const style = document.createElement('style');
