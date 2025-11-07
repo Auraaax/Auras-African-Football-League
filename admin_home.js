@@ -154,93 +154,184 @@ async function loadTournamentStatus() {
     const status = await res.json();
     
     const statusDiv = document.getElementById('tournamentStatus');
+    const championBanner = document.getElementById('championBanner');
     
-    if (!status.canStart) {
-      statusDiv.innerHTML = `
-        <p style="color:#e63946;">⏳ Waiting for 8 registered teams to begin tournament...</p>
-        <p>Current teams: ${status.teamCount} / 8</p>
+    // Update status message
+    statusDiv.innerHTML = `<p style="color:${status.canStart ? '#2a9d8f' : '#e63946'};">${status.message}</p>`;
+    
+    // Show registered teams
+    if (status.teams && status.teams.length > 0) {
+      const teamsListHTML = `
+        <div style="margin-top:1rem;">
+          <h4>Registered Teams (${status.teamCount}/8):</h4>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;margin-top:.5rem;">
+            ${status.teams.map(t => `
+              <div style="padding:.5rem;background:rgba(42,157,143,.1);border-radius:8px;border-left:4px solid #2a9d8f;">
+                ⚽ ${t.name}
+              </div>
+            `).join('')}
+          </div>
+        </div>
       `;
-      return;
+      statusDiv.innerHTML += teamsListHTML;
     }
     
-    let statusText = '';
-    if (status.status === 'not_started') {
-      statusText = '<p style="color:#2a9d8f;">✅ Tournament ready to start! Begin with Quarterfinals below.</p>';
-    } else if (status.status === 'quarterfinals') {
-      statusText = `<p style="color:#d4af37;">🏃 Quarterfinals in progress (${status.quarterfinalsPlayed}/4 completed)</p>`;
-    } else if (status.status === 'semifinals') {
-      statusText = `<p style="color:#d4af37;">🏃 Semifinals in progress (${status.semifinalsPlayed}/2 completed)</p>`;
-    } else if (status.status === 'completed') {
-      statusText = '<p style="color:#2a9d8f;">🏆 Tournament Complete! Check the Final result below.</p>';
+    // Show champion banner if tournament complete
+    if (status.status === 'completed') {
+      const finalMatch = await fetch(`${baseURL}/tournament/matches/Final`).then(r => r.json());
+      if (finalMatch && finalMatch.length > 0 && finalMatch[0].winner) {
+        championBanner.innerHTML = `
+          <div style="background:linear-gradient(135deg,#d4af37,#ffd700);color:#000;padding:2rem;border-radius:12px;text-align:center;margin-bottom:2rem;box-shadow:0 8px 24px rgba(212,175,55,.4);">
+            <h1 style="font-size:2.5rem;margin:0;text-shadow:2px 2px 4px rgba(0,0,0,.2);">
+              🏆 CHAMPION: ${finalMatch[0].winner} 🏆
+            </h1>
+            <p style="margin:.5rem 0 0;font-size:1.2rem;opacity:.9;">
+              Aura's African Football League Champion
+            </p>
+          </div>
+        `;
+        championBanner.style.display = 'block';
+        confetti();
+      }
+    } else {
+      championBanner.style.display = 'none';
     }
     
-    statusDiv.innerHTML = statusText;
-    
-    // Load matches for each round
-    await loadRoundMatches('Quarterfinal', 'quarterfinalsMatches');
-    await loadRoundMatches('Semifinal', 'semifinalsMatches');
-    await loadRoundMatches('Final', 'finalMatch');
+    // Load bracket based on tournament stage
+    if (status.canStart || status.quarterfinalsPlayed > 0) {
+      await loadBracket(status);
+    }
     
   } catch (err) {
     console.error('Failed to load tournament status:', err);
   }
 }
 
-async function loadRoundMatches(round, containerId) {
+async function loadBracket(status) {
+  const bracketContainer = document.getElementById('tournamentBracket');
+  if (!bracketContainer) return;
+  
+  let html = '<div class="bracket-container">';
+  
+  // Quarterfinals
+  html += '<div class="bracket-round"><h3>Quarterfinals</h3>';
+  html += await getRoundHTML('Quarterfinal', status.quarterfinalsPlayed);
+  html += '</div>';
+  
+  // Semifinals (only show if quarterfinals complete)
+  if (status.quarterfinalsPlayed === 4) {
+    html += '<div class="bracket-round"><h3>Semifinals</h3>';
+    html += await getRoundHTML('Semifinal', status.semifinalsPlayed);
+    html += '</div>';
+  }
+  
+  // Final (only show if semifinals complete)
+  if (status.semifinalsPlayed === 2) {
+    html += '<div class="bracket-round"><h3>Final</h3>';
+    html += await getRoundHTML('Final', status.finalPlayed);
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  bracketContainer.innerHTML = html;
+}
+
+async function getRoundHTML(round, playedCount) {
   try {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+    const matchesRes = await fetch(`${baseURL}/tournament/matches/${round}`);
+    const matches = await matchesRes.json();
     
-    // Check if matches exist for this round
-    const res = await fetch(`${baseURL}/tournament/matches/${round}`);
-    const matches = await res.json();
+    let html = '';
     
     if (matches.length > 0) {
       // Display completed matches
-      container.innerHTML = matches.map(m => `
-        <div class="match-card">
-          <div class="match-teams">${m.teamA} vs ${m.teamB}</div>
-          <div class="match-score">${m.scoreA} - ${m.scoreB}</div>
-          <div class="match-result">Winner: ${m.winner}</div>
-          ${m.resultType !== '90min' ? `<div style="font-size:.85rem;color:#aaa;">(${m.resultType})</div>` : ''}
-          ${m.goals && m.goals.length > 0 ? `
-            <div class="match-goals">
-              ${m.goals.map(g => `⚽ ${g.scorer} ${g.minute}'`).join('<br>')}
-            </div>
-          ` : ''}
-          ${m.commentary ? `
-            <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" 
-                    onclick="showCommentary('${m.commentary.replace(/'/g, "\\'")}')">
-              View Commentary
-            </button>
-          ` : ''}
-        </div>
-      `).join('');
-    } else if (round === 'Quarterfinal') {
-      // Show quarterfinal pairings with play/simulate buttons
+      matches.forEach(m => {
+        html += `
+          <div class="bracket-match completed">
+            <div class="match-teams">${m.teamA} vs ${m.teamB}</div>
+            <div class="match-score">${m.scoreA} - ${m.scoreB}</div>
+            <div class="match-winner">Winner: <strong>${m.winner}</strong></div>
+            ${m.resultType !== '90min' ? `<div style="font-size:.85rem;color:#aaa;">(${m.resultType})</div>` : ''}
+            ${m.goals && m.goals.length > 0 ? `
+              <div class="match-goals">
+                ${m.goals.map(g => `⚽ ${g.scorer} ${g.minute}'`).join('<br>')}
+              </div>
+            ` : ''}
+            ${m.commentary ? `
+              <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" 
+                      onclick="showCommentary(\`${m.commentary.replace(/`/g, '\\`')}\`)">
+                View Commentary
+              </button>
+            ` : ''}
+          </div>
+        `;
+      });
+      
+      return html;
+    }
+    
+    // Show pairings with action buttons
+    if (round === 'Quarterfinal') {
       const pairingsRes = await fetch(`${baseURL}/tournament/quarterfinals`);
       const pairings = await pairingsRes.json();
       
-      container.innerHTML = pairings.map((p, idx) => `
-        <div class="match-card">
-          <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+      pairings.forEach((p, idx) => {
+        html += `
+          <div class="bracket-match pending">
+            <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+            <div class="match-actions">
+              <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
+                🎮 Play
+              </button>
+              <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
+                ⚡ Simulate
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    } else if (round === 'Semifinal') {
+      const pairingsRes = await fetch(`${baseURL}/tournament/semifinals`);
+      const pairings = await pairingsRes.json();
+      
+      pairings.forEach((p, idx) => {
+        html += `
+          <div class="bracket-match pending">
+            <div class="match-teams">SF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+            <div class="match-actions">
+              <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">
+                🎮 Play
+              </button>
+              <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">
+                ⚡ Simulate
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    } else if (round === 'Final') {
+      const pairingRes = await fetch(`${baseURL}/tournament/final`);
+      const pairing = await pairingRes.json();
+      
+      html += `
+        <div class="bracket-match pending final-match">
+          <div class="match-teams">🏆 FINAL: ${pairing.teamA.teamName} vs ${pairing.teamB.teamName}</div>
           <div class="match-actions">
-            <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
-              🎮 Play
+            <button class="play-btn" onclick="playMatch('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">
+              🎮 Play Final
             </button>
-            <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
-              ⚡ Simulate
+            <button class="sim-btn" onclick="quickSimulate('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">
+              ⚡ Simulate Final
             </button>
           </div>
         </div>
-      `).join('');
-    } else {
-      // Need to complete previous round first
-      const prevRound = round === 'Semifinal' ? 'Quarterfinals' : 'Semifinals';
-      container.innerHTML = `<p style="text-align:center;color:#666;">Complete ${prevRound} first</p>`;
+      `;
     }
+    
+    return html;
   } catch (err) {
-    console.error(`Failed to load ${round} matches:`, err);
+    console.error(`Failed to load ${round}:`, err);
+    return `<p style="text-align:center;color:#e63946;">Error loading ${round}</p>`;
   }
 }
 

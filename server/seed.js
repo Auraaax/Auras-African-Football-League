@@ -35,7 +35,7 @@ const seedData = async () => {
     ]);
     console.log('👥 Created federation users');
 
-    // Create teams
+    // Create 7 predefined teams (8th team must be added by federation)
     await Team.create([
       { teamName: 'Kaizer Chiefs', federation: 'South Africa', createdBy: admin._id },
       { teamName: 'Orlando Pirates', federation: 'South Africa', createdBy: admin._id },
@@ -43,10 +43,9 @@ const seedData = async () => {
       { teamName: 'SuperSport United', federation: 'South Africa', createdBy: admin._id },
       { teamName: 'TP Mazembe', federation: 'Congo', createdBy: admin._id },
       { teamName: 'Al Ahly', federation: 'Egypt', createdBy: admin._id },
-      { teamName: 'Wydad Casablanca', federation: 'Morocco', createdBy: admin._id },
-      { teamName: 'Esperance', federation: 'Tunisia', createdBy: admin._id }
+      { teamName: 'Wydad Casablanca', federation: 'Morocco', createdBy: admin._id }
     ]);
-    console.log('⚽ Created 8 teams');
+    console.log('⚽ Created 7 predefined teams (waiting for 8th team from federation)');
 
     console.log('\n✅ Seed data created successfully!');
     process.exit(0);

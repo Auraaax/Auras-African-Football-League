@@ -45,31 +45,17 @@
     <section id="tournament" class="panel">
       <h2>Tournament Manager</h2>
       
+      <!-- Champion Banner (shown when tournament complete) -->
+      <div id="championBanner" style="display:none;"></div>
+      
       <div id="tournamentStatus" class="tournament-status"></div>
       
       <div id="tournamentControls" class="tournament-controls">
         <button id="restartTournamentBtn" class="danger-btn">🔄 Restart Tournament</button>
       </div>
 
-      <div id="tournamentBracket" class="tournament-bracket">
-        <!-- Quarterfinals -->
-        <div class="round-section">
-          <h3>Quarterfinals</h3>
-          <div id="quarterfinalsMatches" class="matches-list"></div>
-        </div>
-
-        <!-- Semifinals -->
-        <div class="round-section">
-          <h3>Semifinals</h3>
-          <div id="semifinalsMatches" class="matches-list"></div>
-        </div>
-
-        <!-- Final -->
-        <div class="round-section">
-          <h3>Final</h3>
-          <div id="finalMatch" class="matches-list"></div>
-        </div>
-      </div>
+      <!-- Tournament Bracket (dynamically populated) -->
+      <div id="tournamentBracket" class="tournament-bracket"></div>
 
       <div id="matchCommentary" class="commentary-box" style="display:none;">
         <h3>Match Commentary</h3>

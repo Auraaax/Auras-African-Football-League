@@ -1,29 +1,89 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Visitor Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class="container">
-      <header class="header">
-        <div class="logo">Aura's African Football League</div>
-        <div class="tagline">Visitor Area</div>
-      </header>
-      <main class="main-content">
-        <h2>Welcome, Visitor</h2>
-        <p>This is a placeholder page for visitors. Add content here.</p>
-        <button id="logout">Logout</button>
-      </main>
-    </div>
-    <script>
-      document.getElementById('logout').addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-      });
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAFL Visitors</title>
+  <link rel="stylesheet" href="visitor_home.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="description" content="Public dashboard for Aura’s African Football League: live bracket, match summaries, top scorers, history, and analytics.">
+  <meta property="og:title" content="Aura’s African Football League - Public Dashboard">
+  <meta property="og:description" content="Track the live bracket, match summaries, top scorers, and champions.">
+</head>
+<body>
+  <header class="hero">
+    <div class="overlay"></div>
+    <h1>Aura’s African Football League</h1>
+    <p>Official Tournament Dashboard (Public)</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="bracket">🏆 Bracket</button>
+    <button class="tab-btn" data-target="matches">⚽ Match Summaries</button>
+    <button class="tab-btn" data-target="scorers">🥇 Top Scorers</button>
+    <button class="tab-btn" data-target="history">🕰️ Past Winners</button>
+    <button class="tab-btn" data-target="analytics">📈 Analytics</button>
+  </nav>
+
+  <main class="container">
+    <!-- Bracket -->
+    <section id="bracket" class="panel active">
+      <div id="championBanner" style="display:none;"></div>
+      <div id="bracketStatus" class="info-box"></div>
+      <div id="bracketGrid" class="bracket-grid"></div>
+    </section>
+
+    <!-- Matches -->
+    <section id="matches" class="panel">
+      <div class="grid">
+        <div>
+          <h2>Completed Matches</h2>
+          <div id="matchesList" class="cards"></div>
+        </div>
+        <div>
+          <h2>Match Details</h2>
+          <div id="matchDetails" class="match-details info-box">Select a match to view details.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scorers -->
+    <section id="scorers" class="panel">
+      <div class="toolbar">
+        <label>Filter by Federation
+          <select id="filterFederation"><option value="">All</option></select>
+        </label>
+        <label>Sort by
+          <select id="sortBy">
+            <option value="goals">Goals</option>
+            <option value="name">Name</option>
+            <option value="team">Team</option>
+          </select>
+        </label>
+      </div>
+      <div id="scorersList" class="cards scorers"></div>
+    </section>
+
+    <!-- History -->
+    <section id="history" class="panel">
+      <div id="historyList" class="timeline"></div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" class="panel">
+      <div class="grid-analytics">
+        <div class="info-box" id="analyticsOverview"></div>
+        <canvas id="winsChart"></canvas>
+        <canvas id="goalsChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">© <span id="year"></span> Aura’s African Football League • Public Dashboard</footer>
+
+  <script src="visitor_home.js"></script>
+</body>
 </html>

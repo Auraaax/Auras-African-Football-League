@@ -1,0 +1,47 @@
+body { margin:0; font-family:'League Spartan', system-ui, sans-serif; background:#051b12; color:#fff; }
+.hero { position:relative; padding:4rem 1.5rem 3rem; text-align:center; background:linear-gradient(135deg,#063d2d,#04130d 60%,#000); }
+.hero .overlay { position:absolute; inset:0; background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/African_pattern.svg/512px-African_pattern.svg.png'); opacity:.08; mix-blend-mode:screen; }
+.hero h1 { margin:0; font-size:2.8rem; letter-spacing:1px; background:linear-gradient(90deg,#d4af37,#ffd166); -webkit-background-clip:text; color:transparent; }
+.hero p { margin:.75rem 0 0; font-size:1.1rem; opacity:.9; }
+.tabs { display:flex; flex-wrap:wrap; justify-content:center; gap:.75rem; padding:1rem; background:#071f17; border-bottom:2px solid #d4af37; }
+.tab-btn { background:#0d3025; color:#d4af37; border:1px solid #d4af37; padding:.6rem 1.1rem; cursor:pointer; font-weight:600; border-radius:6px; letter-spacing:.5px; transition:.3s; }
+.tab-btn.active, .tab-btn:hover { background:#d4af37; color:#000; }
+.container { max-width:1250px; margin:0 auto; padding:1.5rem; }
+.panel { display:none; animation:fade .4s ease; }
+.panel.active { display:block; }
+@keyframes fade { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:translateY(0);} }
+.info-box { background:#102e24; border:1px solid #1f5a48; border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.25rem; box-shadow:0 4px 10px rgba(0,0,0,.3); }
+.bracket-grid { display:grid; gap:1.25rem; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+.round-box { background:#0d2420; border:2px solid #1f5a48; border-radius:12px; padding:1rem; position:relative; }
+.round-box h3 { margin:0 0 .75rem; text-align:center; font-size:1.1rem; letter-spacing:.5px; color:#d4af37; }
+.match-card { background:#071b16; border:1px solid #144337; border-radius:10px; padding:.75rem .9rem; margin-bottom:.75rem; position:relative; overflow:hidden; }
+.match-card.completed { border-color:#2a9d8f; }
+.match-teams { font-weight:600; font-size:.95rem; }
+.match-score { font-size:1.2rem; font-weight:700; color:#d4af37; margin:.4rem 0; }
+.match-meta { font-size:.7rem; opacity:.65; }
+.match-winner { font-size:.8rem; font-weight:700; color:#2a9d8f; }
+.champion-banner { background:linear-gradient(135deg,#d4af37,#ffd166); color:#000; padding:1.75rem 1rem; border-radius:14px; text-align:center; margin-bottom:1.5rem; box-shadow:0 8px 24px rgba(212,175,55,.35); }
+.champion-banner h2 { margin:0; font-size:2rem; }
+.cards { display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+.card { background:#0d2420; border:1px solid #1f5a48; border-radius:10px; padding:.85rem .95rem; position:relative; transition:.3s; }
+.card:hover { transform:translateY(-4px); box-shadow:0 6px 18px rgba(0,0,0,.35); }
+.grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); }
+.match-details { min-height:200px; }
+.scorers .scorer { display:flex; flex-direction:column; gap:.35rem; }
+.scorer-name { font-weight:700; }
+.badge { background:#d4af37; color:#000; padding:.25rem .5rem; border-radius:4px; font-size:.65rem; font-weight:700; }
+.trophy { font-size:1.2rem; margin-left:.25rem; }
+.toolbar { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1rem; align-items:flex-end; }
+.toolbar label { display:flex; flex-direction:column; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; }
+.toolbar select { padding:.45rem .6rem; background:#0d3025; color:#fff; border:1px solid #1f5a48; border-radius:6px; }
+.timeline { display:flex; flex-direction:column; gap:1rem; }
+.timeline-item { position:relative; background:#0d2420; border:1px solid #1f5a48; padding:.9rem 1rem .9rem 2.2rem; border-radius:10px; }
+.timeline-item:before { content:''; position:absolute; left:.9rem; top:.9rem; width:10px; height:10px; background:#d4af37; border-radius:50%; box-shadow:0 0 0 4px rgba(212,175,55,.25); }
+.timeline-year { font-weight:700; color:#d4af37; font-size:.9rem; }
+.footer { text-align:center; padding:2rem .75rem 3rem; font-size:.7rem; opacity:.5; }
+.grid-analytics { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); align-items:start; }
+canvas { background:#0d2420; padding:1rem; border:1px solid #1f5a48; border-radius:12px; }
+.fade-in { animation:fade .6s ease; }
+.share-btn { position:absolute; top:.5rem; right:.5rem; background:#d4af37; color:#000; border:none; padding:.3rem .55rem; border-radius:6px; font-size:.65rem; font-weight:700; cursor:pointer; }
+.share-btn:hover { filter:brightness(1.1); }
+@media (max-width:700px){ .tabs { position:sticky; top:0; z-index:40; } }

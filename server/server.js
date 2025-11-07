@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import adminRoutes from './routes/admin.js';
+import visitorRoutes from './routes/visitor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // API routes
 app.use('/api/admin', adminRoutes);
+app.use('/api/visitor', visitorRoutes);
 
 const PORT = process.env.PORT || 3002;
 const MONGODB_URI = process.env.MONGODB_URI;

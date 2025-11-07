@@ -138,13 +138,42 @@ router.get('/tournament/status', async (req, res) => {
     const semifinalsPlayed = await Match.countDocuments({ round: 'Semifinal' });
     const finalPlayed = await Match.countDocuments({ round: 'Final' });
 
+    // Get all teams for display
+    const teams = await Team.find().sort({ teamName: 1 });
+
+    let message = '';
+    let canStart = false;
+
+    if (teamCount < 8) {
+      message = `${teamCount}/8 teams registered. Waiting for ${8 - teamCount} more team(s) to start the tournament.`;
+      canStart = false;
+    } else if (teamCount === 8 && quarterfinalsPlayed === 0) {
+      message = '🎉 All 8 teams registered. Tournament ready to begin!';
+      canStart = true;
+    } else if (quarterfinalsPlayed === 4 && semifinalsPlayed === 0) {
+      message = 'Quarterfinals completed. Ready for Semifinals!';
+      canStart = true;
+    } else if (semifinalsPlayed === 2 && finalPlayed === 0) {
+      message = 'Semifinals completed. Ready for the Final!';
+      canStart = true;
+    } else if (finalPlayed > 0) {
+      const finalMatch = await Match.findOne({ round: 'Final' }).populate('winner');
+      message = finalMatch?.winner ? `🏆 Tournament Complete! Champion: ${finalMatch.winner.teamName}` : 'Tournament Complete!';
+      canStart = false;
+    } else {
+      message = 'Tournament in progress...';
+      canStart = true;
+    }
+
     res.json({
       teamCount,
-      canStart: teamCount >= 8,
+      canStart,
       quarterfinalsPlayed,
       semifinalsPlayed,
       finalPlayed,
-      status: finalPlayed > 0 ? 'completed' : semifinalsPlayed > 0 ? 'semifinals' : quarterfinalsPlayed > 0 ? 'quarterfinals' : 'not_started'
+      status: finalPlayed > 0 ? 'completed' : semifinalsPlayed > 0 ? 'semifinals' : quarterfinalsPlayed > 0 ? 'quarterfinals' : 'not_started',
+      message,
+      teams: teams.map(t => ({ id: t._id, name: t.teamName, federation: t.federation }))
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to get tournament status', details: err.message });
@@ -163,6 +192,51 @@ router.get('/tournament/quarterfinals', async (req, res) => {
     res.json(pairings);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create pairings', details: err.message });
+  }
+});
+
+// GET semifinal pairings (based on quarterfinal winners)
+router.get('/tournament/semifinals', async (req, res) => {
+  try {
+    const quarterfinals = await Match.find({ round: 'Quarterfinal' })
+      .populate(['teamA', 'teamB', 'winner'])
+      .sort({ date: 1 });
+
+    if (quarterfinals.length !== 4 || !quarterfinals.every(m => m.winner)) {
+      return res.status(400).json({ error: 'All quarterfinals must be completed first' });
+    }
+
+    // Pair winners: QF1 winner vs QF2 winner, QF3 winner vs QF4 winner
+    const pairings = [
+      { teamA: quarterfinals[0].winner, teamB: quarterfinals[1].winner },
+      { teamA: quarterfinals[2].winner, teamB: quarterfinals[3].winner }
+    ];
+
+    res.json(pairings);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create semifinal pairings', details: err.message });
+  }
+});
+
+// GET final pairing (based on semifinal winners)
+router.get('/tournament/final', async (req, res) => {
+  try {
+    const semifinals = await Match.find({ round: 'Semifinal' })
+      .populate(['teamA', 'teamB', 'winner'])
+      .sort({ date: 1 });
+
+    if (semifinals.length !== 2 || !semifinals.every(m => m.winner)) {
+      return res.status(400).json({ error: 'Both semifinals must be completed first' });
+    }
+
+    const pairing = {
+      teamA: semifinals[0].winner,
+      teamB: semifinals[1].winner
+    };
+
+    res.json(pairing);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create final pairing', details: err.message });
   }
 });
 
