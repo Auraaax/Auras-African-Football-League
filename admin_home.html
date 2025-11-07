@@ -1,29 +1,82 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class="container">
-      <header class="header">
-        <div class="logo">Aura's African Football League</div>
-        <div class="tagline">Administrator Dashboard</div>
-      </header>
-      <main class="main-content">
-        <h2>Welcome, Administrator</h2>
-        <p>This is a placeholder admin dashboard. Add admin features here.</p>
-        <button id="logout">Logout</button>
-      </main>
-    </div>
-    <script>
-      document.getElementById('logout').addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-      });
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAFL Admin Dashboard</title>
+  <link rel="stylesheet" href="admin_home.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <div class="brand">AAFL Admin</div>
+    <nav>
+      <button class="nav-btn" data-target="dashboard">Dashboard</button>
+      <button class="nav-btn" data-target="simulate">Simulate Match ⚽</button>
+      <button class="nav-btn" data-target="history">Match History</button>
+      <button class="nav-btn" data-target="leaderboard">Leaderboard</button>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="welcome" class="panel">
+      <h1 id="welcomeText">Welcome back, Administrator!</h1>
+    </section>
+
+    <section id="dashboard" class="panel active">
+      <h2>Dashboard Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Federations</h3>
+          <p id="statFederations">-</p>
+        </div>
+        <div class="stat-card">
+          <h3>Teams</h3>
+          <p id="statTeams">-</p>
+        </div>
+        <div class="stat-card">
+          <h3>Matches</h3>
+          <p id="statMatches">-</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulate" class="panel">
+      <h2>Simulate Match</h2>
+      <form id="simulateForm">
+        <label>Team A
+          <select id="teamASelect" required></select>
+        </label>
+        <label>Team B
+          <select id="teamBSelect" required></select>
+        </label>
+        <button type="submit" class="primary">Simulate</button>
+      </form>
+      <div id="simulationResult" class="result"></div>
+      <canvas id="confettiCanvas" class="confetti"></canvas>
+    </section>
+
+    <section id="history" class="panel">
+      <h2>Recent Matches</h2>
+      <table class="matches-table">
+        <thead>
+          <tr><th>Date</th><th>Team A</th><th>Score</th><th>Team B</th></tr>
+        </thead>
+        <tbody id="matchesBody"></tbody>
+      </table>
+    </section>
+
+    <section id="leaderboard" class="panel">
+      <h2>Leaderboard</h2>
+      <table class="leaderboard-table">
+        <thead>
+          <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="admin_home.js"></script>
+</body>
 </html>
