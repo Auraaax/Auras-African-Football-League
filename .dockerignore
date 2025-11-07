@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.DS_Store
+.git
+.gitignore
+server/server.log
+oracleJdk-25.jdk
+**/.env
+**/.env.local
+**/.env.*
