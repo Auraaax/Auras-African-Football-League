@@ -250,6 +250,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('filterFederation').addEventListener('change', renderScorers);
   document.getElementById('sortBy').addEventListener('change', renderScorers);
 
+  setupAuthUI();
+
   await loadBracket();
   await loadMatches();
   await loadScorers();
@@ -263,3 +265,133 @@ window.addEventListener('DOMContentLoaded', async () => {
     setActiveTab('matches');
   }
 });
+
+// ---------- Auth (Visitor / Demo) ----------
+function setupAuthUI(){
+  const openBtn = document.getElementById('openLogin');
+  const modal = document.getElementById('loginModal');
+  const cancelBtn = document.getElementById('cancelLogin');
+  const form = document.getElementById('loginForm');
+  const roleSelect = document.getElementById('loginRole');
+  const passwordRow = document.getElementById('passwordRow');
+  const signOutBtn = document.getElementById('signOut');
+
+  updateAuthStatus();
+
+  openBtn.addEventListener('click', ()=> { 
+    modal.style.display='flex';
+    // default visitor for passwordless convenience
+    if (roleSelect && !roleSelect.value) {
+      roleSelect.value = 'visitor';
+    }
+    if (roleSelect.value === 'visitor') passwordRow.style.display='none'; else passwordRow.style.display='block';
+  });
+  cancelBtn.addEventListener('click', ()=> { modal.style.display='none'; });
+  roleSelect.addEventListener('change', ()=> {
+    if (roleSelect.value === 'visitor') passwordRow.style.display='none'; else passwordRow.style.display='block';
+  });
+  form.addEventListener('submit', handleLogin);
+  form.addEventListener('keyup', (e)=> {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+  // Unified logout handler with storage sweep & visual feedback
+  const handleLogout = () => {
+    console.log('[LOGOUT] Sign out button clicked');
+    console.log('[LOGOUT] Before clear - authToken:', localStorage.getItem('authToken'));
+    console.log('[LOGOUT] Before clear - currentUser:', localStorage.getItem('currentUser'));
+    
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('currentUser');
+    
+    console.log('[LOGOUT] After clear - authToken:', localStorage.getItem('authToken'));
+    console.log('[LOGOUT] After clear - currentUser:', localStorage.getItem('currentUser'));
+    
+    // Immediate UI update
+    signOutBtn.textContent = 'Signing out...';
+    signOutBtn.style.display = 'none';
+    openBtn.style.display = 'inline-block';
+    statusEl.textContent = 'You are browsing as Guest';
+    
+    // Final update after brief delay
+    setTimeout(()=> {
+      signOutBtn.textContent = 'Sign out';
+      console.log('[LOGOUT] Auth status updated');
+    }, 150);
+  };
+  
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', handleLogout);
+    console.log('[AUTH] Sign out button listener attached');
+  } else {
+    console.error('[AUTH] Sign out button not found!');
+  }
+}
+
+function updateAuthStatus(){
+  const statusEl = document.getElementById('authStatus');
+  const signOutBtn = document.getElementById('signOut');
+  const openBtn = document.getElementById('openLogin');
+  const userJSON = localStorage.getItem('currentUser');
+  
+  console.log('[AUTH STATUS] Checking auth status...');
+  console.log('[AUTH STATUS] currentUser in localStorage:', userJSON);
+  
+  if (!userJSON){
+    console.log('[AUTH STATUS] No user found - showing guest mode');
+    statusEl.textContent = 'You are browsing as Guest';
+    openBtn.style.display='inline-block';
+    signOutBtn.style.display='none';
+    return;
+  }
+  const user = JSON.parse(userJSON);
+  console.log('[AUTH STATUS] User found:', user);
+  statusEl.textContent = `Signed in as ${user.name} (${user.role})`;
+  openBtn.style.display='none';
+  signOutBtn.style.display='inline-block';
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  console.log('[LOGIN] Form submitted');
+  
+  const email = document.getElementById('loginEmail').value.trim();
+  const name = document.getElementById('loginName').value.trim() || 'Visitor';
+  const role = document.getElementById('loginRole').value;
+  const password = document.getElementById('loginPassword').value.trim();
+
+  console.log('[LOGIN] Attempting login with role:', role);
+
+  const payload = role === 'visitor'
+    ? { email, name, role }
+    : { email, password, role };
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok){
+      console.error('[LOGIN] Login failed:', data.error);
+      alert(data.error || 'Login failed');
+      return;
+    }
+    
+    console.log('[LOGIN] Login successful:', data.user);
+    localStorage.setItem('authToken', data.token);
+    localStorage.setItem('currentUser', JSON.stringify(data.user));
+    console.log('[LOGIN] Tokens stored in localStorage');
+    
+    document.getElementById('loginModal').style.display='none';
+    updateAuthStatus();
+  } catch(err){
+    console.error('[LOGIN] Login error:', err);
+    alert('Login error: '+ err.message);
+  }
+}

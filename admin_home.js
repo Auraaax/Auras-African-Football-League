@@ -49,6 +49,27 @@ async function loadTeams() {
       a.insertAdjacentHTML('beforeend', `<option value="${t._id}">${t.teamName}</option>`);
       b.insertAdjacentHTML('beforeend', `<option value="${t._id}">${t.teamName}</option>`);
     });
+
+    // Populate teams management list
+    const teamsList = document.getElementById('teamsList');
+    if (teamsList) {
+      if (teams.length === 0) {
+        teamsList.innerHTML = '<div class="info-box">No teams registered yet.</div>';
+      } else {
+        teamsList.innerHTML = teams.map(t => `
+          <div class="team-item">
+            <div class="team-info">
+              <h3>${t.teamName}</h3>
+              <p>Federation: ${t.federation || 'N/A'}</p>
+              <p class="team-id">ID: ${t._id}</p>
+            </div>
+            <button class="danger-btn" onclick="deleteTeam('${t._id}', '${t.teamName.replace(/'/g, "\\'")}')">
+              🗑️ Delete Team
+            </button>
+          </div>
+        `).join('');
+      }
+    }
   } catch (err) {
     console.error('Failed to load teams:', err);
   }
@@ -128,9 +149,17 @@ async function simulateMatch(e) {
 }
 
 function logout() {
+  console.log('[ADMIN LOGOUT] Logout button clicked');
+  console.log('[ADMIN LOGOUT] Before clear - localStorage authToken:', localStorage.getItem('authToken'));
+  console.log('[ADMIN LOGOUT] Before clear - sessionStorage authToken:', sessionStorage.getItem('authToken'));
+  
   localStorage.removeItem('authToken');
   sessionStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
+  
+  console.log('[ADMIN LOGOUT] After clear - localStorage authToken:', localStorage.getItem('authToken'));
+  console.log('[ADMIN LOGOUT] Redirecting to login.html');
+  
   window.location.href = 'login.html';
 }
 
@@ -434,6 +463,36 @@ async function restartTournament() {
     }
   } catch (err) {
     alert('Error: ' + err.message);
+  }
+}
+
+// Delete team function
+async function deleteTeam(teamId, teamName) {
+  if (!confirm(`Are you sure you want to delete "${teamName}"?\n\nThis will also delete all matches involving this team.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${baseURL}/teams/${teamId}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(data.message);
+      // Reload teams list and dashboard stats
+      await loadTeams();
+      await loadDashboard();
+      await loadMatches();
+      await loadLeaderboard();
+      await loadTournamentStatus();
+    } else {
+      alert(data.error || 'Failed to delete team');
+    }
+  } catch (err) {
+    alert('Error deleting team: ' + err.message);
   }
 }
 

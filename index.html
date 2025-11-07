@@ -3,136 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura's African Football League</title>
+    <title>Aura's African Football League - Home</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <h1 class="logo">Aura's African Football League</h1>
-            <p class="tagline">Celebrating African Football Excellence</p>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">⚽ AAFL</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <div class="container">
-            <!-- User Role Selection -->
-            <section class="role-selection">
-                <h2>Join the African Football Community</h2>
-                <p>Select your role to get started</p>
-                
-                <div class="role-buttons">
-                    <button class="role-btn" data-role="administrator">Administrator</button>
-                    <button class="role-btn" data-role="federation">Federation</button>
-                    <button class="role-btn" data-role="visitor">Visitor</button>
-                </div>
-            </section>
-
-            <!-- Forms Section -->
-            <section class="forms-section">
-                <!-- Administrator Form -->
-                <div id="admin-form" class="form-container hidden">
-                    <h3>Administrator Registration</h3>
-                    <form id="adminRegistration" class="registration-form">
-                        <div class="form-group">
-                            <label for="admin-name">Full Name</label>
-                            <input type="text" id="admin-name" name="name" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-email">Email</label>
-                            <input type="email" id="admin-email" name="email" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-password">Password</label>
-                            <input type="password" id="admin-password" name="password" minlength="6" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-code">Administrator Code</label>
-                            <input type="text" id="admin-code" name="adminCode" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <button type="submit" class="submit-btn">Register as Administrator</button>
-                    </form>
-                </div>
-
-                <!-- Federation Form -->
-                <div id="federation-form" class="form-container hidden">
-                    <h3>Federation Registration</h3>
-                    <form id="federationRegistration" class="registration-form">
-                        <div class="form-group">
-                            <label for="federation-name">Federation Name</label>
-                            <input type="text" id="federation-name" name="federationName" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="federation-email">Email</label>
-                            <input type="email" id="federation-email" name="email" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="federation-password">Password</label>
-                            <input type="password" id="federation-password" name="password" minlength="6" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="federation-country">Country</label>
-                            <input type="text" id="federation-country" name="country" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <button type="submit" class="submit-btn">Register Federation</button>
-                    </form>
-                </div>
-
-                <!-- Visitor Form -->
-                <div id="visitor-form" class="form-container hidden">
-                    <h3>Visitor Registration</h3>
-                    <form id="visitorRegistration" class="registration-form">
-                        <div class="form-group">
-                            <label for="visitor-name">Full Name</label>
-                            <input type="text" id="visitor-name" name="name" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="visitor-email">Email</label>
-                            <input type="email" id="visitor-email" name="email" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="visitor-password">Password</label>
-                            <input type="password" id="visitor-password" name="password" minlength="6" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <div class="form-group">
-                            <label for="visitor-country">Country of Residence</label>
-                            <input type="text" id="visitor-country" name="country" required>
-                            <span class="error-message"></span>
-                        </div>
-                        <button type="submit" class="submit-btn">Register as Visitor</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- Success Message Section -->
-            <section id="success-message" class="success-message hidden">
-                <div class="success-content">
-                    <h2>Welcome to Aura's African Football League!</h2>
-                    <p>Your registration was successful. You're now part of Africa's premier football community.</p>
-                    <button id="back-to-home" class="submit-btn">Back to Home</button>
-                </div>
-            </section>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Aura's African Football League</h1>
+            <p class="hero-subtitle">Celebrating African Football Excellence</p>
+            <p class="hero-description">
+                Join us in celebrating the spirit of African football. Connect federations across the continent,
+                promote competitive tournaments, and showcase the incredible talent that defines our beautiful game.
+                Together, we're building the future of African football.
+            </p>
+            <div class="hero-buttons">
+                <a href="register.html" class="hero-btn primary">
+                    <span>Sign Up</span>
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="login.html" class="hero-btn secondary">
+                    <span>Login</span>
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="visitor_home.html" class="hero-btn tertiary">
+                    <span>Continue as Visitor</span>
+                    <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
         </div>
-    </main>
+        <div class="hero-scroll">
+            <span>Scroll to explore</span>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">Our Vision</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="card-icon">🏆</div>
+                    <h3>Celebrating Excellence</h3>
+                    <p>Showcasing the best of African football talent through competitive tournaments and world-class events.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">🤝</div>
+                    <h3>Connecting Federations</h3>
+                    <p>Building bridges across the continent, uniting federations in their shared passion for the beautiful game.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Promoting Growth</h3>
+                    <p>Fostering development, innovation, and opportunities for players, coaches, and fans across Africa.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="contact-text">Have questions? Want to partner with us? We'd love to hear from you!</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    <span>contact@aurafootball.com</span>
+                </div>
+                <div class="contact-item">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>African Football Headquarters</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2023 Aura's African Football League. Celebrating African Football Excellence.</p>
+            <p>&copy; 2025 Aura's African Football League. Celebrating African Football Excellence.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">FAQ</a>
+            </div>
         </div>
     </footer>
 

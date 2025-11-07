@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Aura's African Football League</title>
+    <link rel="stylesheet" href="register.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    
+    <div class="register-container">
+        <header class="register-header">
+            <h1 class="league-logo">⚽ Aura's African Football League</h1>
+            <p class="welcome-message">Join the Movement!</p>
+            <p class="subtitle">Register your federation and be part of African football history</p>
+        </header>
+
+        <main class="register-main">
+            <form id="registerForm" class="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="federationName">Federation Name <span class="required">*</span></label>
+                        <div class="input-container">
+                            <input type="text" id="federationName" name="federationName" placeholder="e.g., Nigerian Football Federation" required>
+                            <span class="input-icon">🏆</span>
+                        </div>
+                        <span class="error-message" id="federationName-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country <span class="required">*</span></label>
+                        <div class="select-container">
+                            <select id="country" name="country" required>
+                                <option value="">Select your country</option>
+                                <option value="Algeria">Algeria</option>
+                                <option value="Angola">Angola</option>
+                                <option value="Benin">Benin</option>
+                                <option value="Botswana">Botswana</option>
+                                <option value="Burkina Faso">Burkina Faso</option>
+                                <option value="Burundi">Burundi</option>
+                                <option value="Cameroon">Cameroon</option>
+                                <option value="Cape Verde">Cape Verde</option>
+                                <option value="Central African Republic">Central African Republic</option>
+                                <option value="Chad">Chad</option>
+                                <option value="Comoros">Comoros</option>
+                                <option value="Congo">Congo</option>
+                                <option value="DR Congo">DR Congo</option>
+                                <option value="Djibouti">Djibouti</option>
+                                <option value="Egypt">Egypt</option>
+                                <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                <option value="Eritrea">Eritrea</option>
+                                <option value="Eswatini">Eswatini</option>
+                                <option value="Ethiopia">Ethiopia</option>
+                                <option value="Gabon">Gabon</option>
+                                <option value="Gambia">Gambia</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="Guinea">Guinea</option>
+                                <option value="Guinea-Bissau">Guinea-Bissau</option>
+                                <option value="Ivory Coast">Ivory Coast</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="Lesotho">Lesotho</option>
+                                <option value="Liberia">Liberia</option>
+                                <option value="Libya">Libya</option>
+                                <option value="Madagascar">Madagascar</option>
+                                <option value="Malawi">Malawi</option>
+                                <option value="Mali">Mali</option>
+                                <option value="Mauritania">Mauritania</option>
+                                <option value="Mauritius">Mauritius</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Mozambique">Mozambique</option>
+                                <option value="Namibia">Namibia</option>
+                                <option value="Niger">Niger</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                                <option value="Senegal">Senegal</option>
+                                <option value="Seychelles">Seychelles</option>
+                                <option value="Sierra Leone">Sierra Leone</option>
+                                <option value="Somalia">Somalia</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="South Sudan">South Sudan</option>
+                                <option value="Sudan">Sudan</option>
+                                <option value="Tanzania">Tanzania</option>
+                                <option value="Togo">Togo</option>
+                                <option value="Tunisia">Tunisia</option>
+                                <option value="Uganda">Uganda</option>
+                                <option value="Zambia">Zambia</option>
+                                <option value="Zimbabwe">Zimbabwe</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                        <span class="error-message" id="country-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPerson">Contact Person <span class="required">*</span></label>
+                    <div class="input-container">
+                        <input type="text" id="contactPerson" name="contactPerson" placeholder="Full Name" required>
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <span class="error-message" id="contactPerson-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <div class="input-container">
+                        <input type="email" id="email" name="email" placeholder="contact@federation.com" required>
+                        <span class="input-icon">✉️</span>
+                    </div>
+                    <span class="error-message" id="email-error"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <div class="input-container">
+                            <input type="password" id="password" name="password" placeholder="Min. 8 characters" required>
+                            <span class="input-icon toggle-password" data-target="password">👁️</span>
+                        </div>
+                        <span class="error-message" id="password-error"></span>
+                        <div class="password-strength" id="password-strength"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                        <div class="input-container">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+                            <span class="input-icon toggle-password" data-target="confirmPassword">👁️</span>
+                        </div>
+                        <span class="error-message" id="confirmPassword-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <span>I agree to the <a href="#" class="link">Terms & Conditions</a> and <a href="#" class="link">Privacy Policy</a></span>
+                    </label>
+                    <span class="error-message" id="terms-error"></span>
+                </div>
+
+                <button type="submit" class="register-btn">
+                    <span class="btn-text">Create Federation Account</span>
+                    <span class="btn-loader hidden">⏳ Processing...</span>
+                </button>
+
+                <div id="register-error" class="error-message global-error hidden"></div>
+                <div id="register-success" class="success-message hidden">
+                    ✅ Registration successful! Redirecting...
+                </div>
+            </form>
+
+            <div class="login-link">
+                <p>Already have an account? <a href="login.html" class="login-cta">Sign in here</a></p>
+            </div>
+        </main>
+
+        <footer class="register-footer">
+            <p>&copy; 2025 Aura's African Football League. Celebrating African Football Excellence.</p>
+        </footer>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

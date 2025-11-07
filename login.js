@@ -2,6 +2,7 @@
 const loginForm = document.getElementById('loginForm');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
+const nameInput = document.getElementById('name');
 const userTypeSelect = document.getElementById('userType');
 const loginBtn = document.querySelector('.login-btn');
 const btnText = document.querySelector('.btn-text');
@@ -20,16 +21,35 @@ const rolePages = {
 
 // Initialize the login page
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure a sensible default role (visitor is passwordless)
+    if (!userTypeSelect.value) {
+        userTypeSelect.value = 'visitor';
+    }
+
+    // Apply initial role-based UI adjustments (hide password for visitor)
+    adjustForRole();
+
     // Check if user is already logged in (optional feature)
     checkExistingSession();
-    
+
     // Add event listeners
     loginForm.addEventListener('submit', handleLogin);
-    
+
     // Add input event listeners for real-time validation
     emailInput.addEventListener('input', clearFieldError);
     passwordInput.addEventListener('input', clearFieldError);
-    userTypeSelect.addEventListener('change', clearFieldError);
+    userTypeSelect.addEventListener('change', (e)=> { clearFieldError(e); adjustForRole(); });
+
+    // Allow pressing Enter on any field to trigger login explicitly
+    [emailInput, passwordInput, nameInput, userTypeSelect].forEach(el => {
+        if (el) {
+            el.addEventListener('keyup', (evt) => {
+                if (evt.key === 'Enter') {
+                    loginForm.requestSubmit();
+                }
+            });
+        }
+    });
 });
 
 // Function to check if user already has an active session
@@ -96,13 +116,15 @@ function validateForm() {
         isValid = false;
     }
     
-    // Validate password
-    if (!passwordInput.value) {
-        showFieldError(passwordError, 'Password is required');
-        isValid = false;
-    } else if (passwordInput.value.length < 6) {
-        showFieldError(passwordError, 'Password must be at least 6 characters');
-        isValid = false;
+    // Validate password (skip for visitor)
+    if (userTypeSelect.value !== 'visitor') {
+        if (!passwordInput.value) {
+            showFieldError(passwordError, 'Password is required');
+            isValid = false;
+        } else if (passwordInput.value.length < 6) {
+            showFieldError(passwordError, 'Password must be at least 6 characters');
+            isValid = false;
+        }
     }
     
     // Validate user type
@@ -118,13 +140,18 @@ function validateForm() {
 async function authenticateUserRemote() {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
+    const name = (nameInput?.value || '').trim();
     const userType = userTypeSelect.value;
 
+    const payload = userType === 'visitor'
+        ? { email: email || 'visitor@aafl.local', name: name || 'Visitor', role: 'visitor' }
+        : { email, password, role: userType };
+
     try {
-        const res = await fetch('/api/login', {
+        const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, role: userType })
+            body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
@@ -150,7 +177,7 @@ function handleSuccessfulLogin() {
     // Redirect to appropriate dashboard after brief delay
     setTimeout(() => {
         redirectToDashboard(userType);
-    }, 1000);
+    }, 700);
 }
 
 // Function to handle failed login
@@ -234,6 +261,23 @@ function clearFieldError(e) {
     
     // Hide global error if user starts typing again
     loginError.classList.add('hidden');
+}
+
+// Adjust UI and validation for selected role
+function adjustForRole(){
+    const role = userTypeSelect.value;
+    const passwordGroup = document.getElementById('password-group');
+    const nameGroup = document.getElementById('name-group');
+    if (role === 'visitor'){
+        // visitor is passwordless
+        if (passwordInput) passwordInput.required = false;
+        if (passwordGroup) passwordGroup.style.display = 'none';
+        if (nameGroup) nameGroup.style.display = 'block';
+    } else {
+        if (passwordInput) passwordInput.required = true;
+        if (passwordGroup) passwordGroup.style.display = 'block';
+        if (nameGroup) nameGroup.style.display = 'none';
+    }
 }
 
 // Add shake animation for error feedback

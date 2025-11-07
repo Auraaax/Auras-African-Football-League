@@ -18,6 +18,11 @@
     <div class="overlay"></div>
     <h1>Aura’s African Football League</h1>
     <p>Official Tournament Dashboard (Public)</p>
+    <div class="auth-controls">
+      <div id="authStatus">You are browsing as Guest</div>
+      <button id="openLogin" class="btn small">Sign in</button>
+      <button id="signOut" class="btn small danger" style="display:none;">Sign out</button>
+    </div>
   </header>
 
   <nav class="tabs">
@@ -29,6 +34,38 @@
   </nav>
 
   <main class="container">
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h3>Sign in</h3>
+        <p class="muted">Visitors can sign in without a password.</p>
+        <form id="loginForm">
+          <label>Email
+            <input type="email" id="loginEmail" placeholder="you@example.com" />
+          </label>
+          <label>Name
+            <input type="text" id="loginName" placeholder="Visitor" />
+          </label>
+          <label>Role
+            <select id="loginRole">
+              <option value="visitor">Visitor</option>
+              <option value="federation">Federation (demo)</option>
+              <option value="administrator">Administrator (demo)</option>
+            </select>
+          </label>
+          <label id="passwordRow" style="display:none;">Password
+            <input type="password" id="loginPassword" placeholder="demo password" />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn" id="cancelLogin">Cancel</button>
+            <button type="submit" class="btn primary">Sign in</button>
+          </div>
+        </form>
+        <div class="modal-footer">
+          <p class="muted">Or use the <a href="login.html" class="login-link">dedicated login page</a></p>
+        </div>
+      </div>
+    </div>
     <!-- Bracket -->
     <section id="bracket" class="panel active">
       <div id="championBanner" style="display:none;"></div>

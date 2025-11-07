@@ -228,9 +228,88 @@ main { padding: 1.25rem; max-width: 1100px; margin: 0 auto; }
   font-size:1.1rem;
 }
 
+/* Team Management Styles */
+.team-management {
+  max-width: 800px;
+}
+
+.teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.team-item {
+  background: #122;
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.team-item:hover {
+  background: #1a3;
+  border-color: #ffd700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.team-info {
+  flex: 1;
+}
+
+.team-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: #d4af37;
+}
+
+.team-info p {
+  margin: 0.25rem 0;
+  color: #bbb;
+  font-size: 0.9rem;
+}
+
+.team-id {
+  font-family: monospace;
+  font-size: 0.75rem !important;
+  color: #666 !important;
+}
+
+.info-box {
+  background: rgba(212, 175, 55, 0.1);
+  border-left: 3px solid #d4af37;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.info-box p {
+  margin: 0.5rem 0;
+  color: #ddd;
+}
+
+.info-box strong {
+  color: #d4af37;
+}
+
 @media (max-width:700px){
   #simulateForm { flex-direction:column; align-items:stretch; }
   .nav-btn, .logout { margin: .25rem 0; }
   .tournament-bracket { grid-template-columns:1fr; }
   .bracket-container { grid-template-columns:1fr; }
+  
+  .team-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .team-info h3 {
+    font-size: 1.1rem;
+  }
 }

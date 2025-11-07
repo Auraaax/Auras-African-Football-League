@@ -3,6 +3,12 @@ body { margin:0; font-family:'League Spartan', system-ui, sans-serif; background
 .hero .overlay { position:absolute; inset:0; background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/African_pattern.svg/512px-African_pattern.svg.png'); opacity:.08; mix-blend-mode:screen; }
 .hero h1 { margin:0; font-size:2.8rem; letter-spacing:1px; background:linear-gradient(90deg,#d4af37,#ffd166); -webkit-background-clip:text; color:transparent; }
 .hero p { margin:.75rem 0 0; font-size:1.1rem; opacity:.9; }
+.auth-controls { display:flex; gap:.5rem; justify-content:center; align-items:center; margin-top:1rem; flex-wrap:wrap; }
+#authStatus { font-size:.9rem; opacity:.85; }
+.btn { background:#0d3025; color:#d4af37; border:1px solid #d4af37; padding:.45rem .8rem; border-radius:6px; cursor:pointer; font-weight:700; }
+.btn.small { font-size:.8rem; padding:.35rem .6rem; }
+.btn.primary { background:#d4af37; color:#000; border:none; }
+.btn.danger { border-color:#e63946; color:#e63946; }
 .tabs { display:flex; flex-wrap:wrap; justify-content:center; gap:.75rem; padding:1rem; background:#071f17; border-bottom:2px solid #d4af37; }
 .tab-btn { background:#0d3025; color:#d4af37; border:1px solid #d4af37; padding:.6rem 1.1rem; cursor:pointer; font-weight:600; border-radius:6px; letter-spacing:.5px; transition:.3s; }
 .tab-btn.active, .tab-btn:hover { background:#d4af37; color:#000; }
@@ -45,3 +51,16 @@ canvas { background:#0d2420; padding:1rem; border:1px solid #1f5a48; border-radi
 .share-btn { position:absolute; top:.5rem; right:.5rem; background:#d4af37; color:#000; border:none; padding:.3rem .55rem; border-radius:6px; font-size:.65rem; font-weight:700; cursor:pointer; }
 .share-btn:hover { filter:brightness(1.1); }
 @media (max-width:700px){ .tabs { position:sticky; top:0; z-index:40; } }
+
+/* Modal */
+.modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:1000; }
+.modal-content { width:min(520px, 92vw); background:#0d2420; border:1px solid #1f5a48; border-radius:12px; padding:1rem 1.2rem; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+.modal-content h3 { margin:.25rem 0 .5rem; }
+.modal-content label { display:flex; flex-direction:column; text-align:left; gap:.25rem; margin:.5rem 0; font-size:.8rem; }
+.modal-content input, .modal-content select { background:#0d3025; color:#fff; border:1px solid #1f5a48; border-radius:6px; padding:.5rem .6rem; }
+.modal-actions { display:flex; justify-content:flex-end; gap:.5rem; margin-top:.75rem; }
+.modal-footer { margin-top:1rem; padding-top:1rem; border-top:1px solid #1f5a48; text-align:center; }
+.modal-footer .muted { font-size:.8rem; }
+.login-link { color:#2a9d8f; text-decoration:none; font-weight:600; transition:color .3s; }
+.login-link:hover { color:#d4af37; text-decoration:underline; }
+.muted { opacity:.7; font-size:.85rem; }

@@ -1,29 +1,224 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Federation Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div class="container">
-      <header class="header">
-        <div class="logo">Aura's African Football League</div>
-        <div class="tagline">Federation Dashboard</div>
-      </header>
-      <main class="main-content">
-        <h2>Welcome, Federation</h2>
-        <p>This is a placeholder federation dashboard. Add features here.</p>
-        <button id="logout">Logout</button>
-      </main>
-    </div>
-    <script>
-      document.getElementById('logout').addEventListener('click', () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-      });
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Federation Registration - AAFL</title>
+  <link rel="stylesheet" href="federation_home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <h1>Aura's African Football League</h1>
+        <p class="tagline">Federation Registration Portal</p>
+      </div>
+      <div class="user-info">
+        <span id="userName">Federation Representative</span>
+        <button id="logoutBtn" class="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Section -->
+      <section id="welcomeSection" class="welcome-section">
+        <h2>Welcome to the Tournament Registration</h2>
+        <p>Register your country and build your 23-player squad to compete in Aura's African Football League</p>
+      </section>
+
+      <!-- Already Registered View -->
+      <section id="registeredView" class="registered-view" style="display: none;">
+        <div class="success-banner">
+          <h2>✅ Federation Registered Successfully</h2>
+          <p id="registeredCountry"></p>
+        </div>
+        
+        <div class="team-summary">
+          <h3>Team Summary</h3>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <span class="label">Country</span>
+              <span class="value" id="summaryCountry">-</span>
+            </div>
+            <div class="summary-card">
+              <span class="label">Team Name</span>
+              <span class="value" id="summaryTeamName">-</span>
+            </div>
+            <div class="summary-card">
+              <span class="label">Manager</span>
+              <span class="value" id="summaryManager">-</span>
+            </div>
+            <div class="summary-card highlight">
+              <span class="label">Country Rating</span>
+              <span class="value" id="summaryRating">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="squad-display">
+          <h3>Your Squad (23 Players)</h3>
+          <div class="table-container">
+            <table id="registeredSquadTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Player Name</th>
+                  <th>Position</th>
+                  <th>GK</th>
+                  <th>DF</th>
+                  <th>MD</th>
+                  <th>AT</th>
+                  <th>Captain</th>
+                </tr>
+              </thead>
+              <tbody id="registeredSquadBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tournament-status">
+          <h3>🏆 Tournament Status</h3>
+          <p>Your team is registered and ready for the tournament. Wait for the administrator to begin the matches.</p>
+        </div>
+      </section>
+
+      <!-- Registration Form -->
+      <section id="registrationForm" class="registration-form">
+        <form id="fedForm">
+          <div class="form-section">
+            <h3>Federation Information</h3>
+            
+            <div class="form-group">
+              <label for="country">Select Your Country *</label>
+              <select id="country" name="country" required>
+                <option value="">-- Choose African Country --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="teamName">Team Name *</label>
+              <input type="text" id="teamName" name="teamName" placeholder="e.g., Eagles of Nigeria" required>
+              <small>The official name of your national team</small>
+            </div>
+
+            <div class="form-group">
+              <label for="manager">Manager Name *</label>
+              <input type="text" id="manager" name="manager" placeholder="e.g., John Mensah" required>
+              <small>Head coach or team manager</small>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Squad Generation</h3>
+            <p class="info-text">Your 23-player squad will be auto-generated with random names and ratings based on their natural positions.</p>
+            
+            <div class="button-group">
+              <button type="button" id="generateSquadBtn" class="btn btn-secondary">
+                🎲 Generate Squad
+              </button>
+              <button type="button" id="regenerateSquadBtn" class="btn btn-secondary" style="display: none;">
+                🔄 Regenerate Squad
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Squad Preview -->
+        <div id="squadPreview" class="squad-preview" style="display: none;">
+          <div class="squad-header">
+            <h3>Your Squad (23 Players)</h3>
+            <div class="rating-display">
+              <span class="rating-label">Country Rating:</span>
+              <span id="countryRating" class="rating-value">0.0</span>
+              <div class="rating-stars" id="ratingStars"></div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table id="squadTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Player Name</th>
+                  <th>Position</th>
+                  <th>GK</th>
+                  <th>DF</th>
+                  <th>MD</th>
+                  <th>AT</th>
+                  <th>Captain</th>
+                </tr>
+              </thead>
+              <tbody id="squadBody"></tbody>
+            </table>
+          </div>
+
+          <div class="position-summary">
+            <div class="pos-card">
+              <span class="pos-icon">🧤</span>
+              <span class="pos-label">Goalkeepers</span>
+              <span class="pos-count" id="gkCount">0</span>
+            </div>
+            <div class="pos-card">
+              <span class="pos-icon">🛡️</span>
+              <span class="pos-label">Defenders</span>
+              <span class="pos-count" id="dfCount">0</span>
+            </div>
+            <div class="pos-card">
+              <span class="pos-icon">⚙️</span>
+              <span class="pos-label">Midfielders</span>
+              <span class="pos-count" id="mdCount">0</span>
+            </div>
+            <div class="pos-card">
+              <span class="pos-icon">⚡</span>
+              <span class="pos-label">Attackers</span>
+              <span class="pos-count" id="atCount">0</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="submitRegistrationBtn" class="btn btn-primary">
+              ✅ Submit Registration
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Processing registration...</p>
+      </div>
+
+      <!-- Success Modal -->
+      <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content success">
+          <h2>🎉 Registration Successful!</h2>
+          <p id="successMessage"></p>
+          <button id="closeSuccessBtn" class="btn btn-primary">View My Team</button>
+        </div>
+      </div>
+
+      <!-- Error Modal -->
+      <div id="errorModal" class="modal" style="display: none;">
+        <div class="modal-content error">
+          <h2>⚠️ Registration Failed</h2>
+          <p id="errorMessage"></p>
+          <button id="closeErrorBtn" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2025 Aura's African Football League • Federation Portal</p>
+    </footer>
+  </div>
+
+  <script src="federation_home.js"></script>
+</body>
 </html>

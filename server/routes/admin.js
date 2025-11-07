@@ -43,6 +43,43 @@ router.get('/teams', async (req, res) => {
   }
 });
 
+// DELETE team by ID
+router.delete('/teams/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid team ID' });
+    }
+
+    // Find team first to get details
+    const team = await Team.findById(id);
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    // Delete associated matches where this team participated (using ObjectId)
+    const deleteResult = await Match.deleteMany({
+      $or: [
+        { teamA: new mongoose.Types.ObjectId(id) }, 
+        { teamB: new mongoose.Types.ObjectId(id) }
+      ]
+    });
+
+    // Delete the team
+    await Team.findByIdAndDelete(id);
+
+    res.json({ 
+      message: `Team "${team.teamName}" and ${deleteResult.deletedCount} associated match(es) have been deleted successfully`,
+      deletedTeam: team.teamName,
+      deletedMatches: deleteResult.deletedCount
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete team', details: err.message });
+  }
+});
+
 // POST simulate match
 router.post('/simulate-match', async (req, res) => {
   try {

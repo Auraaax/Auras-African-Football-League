@@ -11,6 +11,7 @@
     <div class="brand">AAFL Admin</div>
     <nav>
       <button class="nav-btn" data-target="dashboard">Dashboard</button>
+      <button class="nav-btn" data-target="teams">Teams</button>
       <button class="nav-btn" data-target="tournament">🏆 Tournament</button>
       <button class="nav-btn" data-target="simulate">Simulate Match ⚽</button>
       <button class="nav-btn" data-target="history">Match History</button>
@@ -39,6 +40,17 @@
           <h3>Matches</h3>
           <p id="statMatches">-</p>
         </div>
+      </div>
+    </section>
+
+    <section id="teams" class="panel">
+      <h2>Team Management</h2>
+      <div class="team-management">
+        <div class="info-box">
+          <p>Manage all registered teams. You can delete teams and their associated matches.</p>
+          <p><strong>Warning:</strong> Deleting a team will also remove all their matches from the database.</p>
+        </div>
+        <div id="teamsList" class="teams-list"></div>
       </div>
     </section>
 

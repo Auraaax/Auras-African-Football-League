@@ -1,0 +1,480 @@
+/* African-Inspired Registration Page Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --african-green: #1a5319;
+    --african-gold: #d4af37;
+    --african-red: #c41e3a;
+    --african-black: #0b211c;
+    --white: #ffffff;
+    --light-gray: #f5f5f5;
+    --border-gray: #e1e1e1;
+    --text-dark: #2c2c2c;
+    --error-red: #e63946;
+    --success-green: #2a9d8f;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: linear-gradient(135deg, var(--african-green) 0%, var(--african-black) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.background-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(212, 175, 55, 0.03) 35px, rgba(212, 175, 55, 0.03) 70px),
+        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(196, 30, 58, 0.03) 35px, rgba(196, 30, 58, 0.03) 70px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.register-container {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.register-header {
+    background: linear-gradient(135deg, var(--african-green), var(--african-black));
+    color: var(--white);
+    padding: 2.5rem 2rem;
+    border-radius: 20px 20px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.league-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--african-gold), #ffd166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-message {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: var(--african-gold);
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.register-main {
+    padding: 2.5rem 2rem;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.required {
+    color: var(--error-red);
+    font-size: 1rem;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 0.85rem 3rem 0.85rem 1rem;
+    border: 2px solid var(--border-gray);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Open Sans', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.input-container input:focus {
+    outline: none;
+    border-color: var(--african-green);
+    box-shadow: 0 0 0 4px rgba(26, 83, 25, 0.1);
+}
+
+.input-container input.error {
+    border-color: var(--error-red);
+}
+
+.input-icon {
+    position: absolute;
+    right: 1rem;
+    font-size: 1.2rem;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.toggle-password {
+    cursor: pointer;
+    pointer-events: all;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.toggle-password:hover {
+    transform: scale(1.1);
+}
+
+.select-container {
+    position: relative;
+}
+
+.select-container select {
+    width: 100%;
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+    border: 2px solid var(--border-gray);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Open Sans', sans-serif;
+    background: var(--white);
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.3s ease;
+}
+
+.select-container select:focus {
+    outline: none;
+    border-color: var(--african-green);
+    box-shadow: 0 0 0 4px rgba(26, 83, 25, 0.1);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--african-green);
+    font-size: 0.8rem;
+}
+
+.error-message {
+    font-size: 0.8rem;
+    color: var(--error-red);
+    margin-top: 0.25rem;
+    display: none;
+    font-weight: 600;
+}
+
+.error-message:not(.hidden) {
+    display: block;
+}
+
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-gray);
+    margin-top: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.password-strength.weak {
+    background: linear-gradient(to right, var(--error-red) 33%, var(--border-gray) 33%);
+}
+
+.password-strength.medium {
+    background: linear-gradient(to right, var(--african-gold) 66%, var(--border-gray) 66%);
+}
+
+.password-strength.strong {
+    background: linear-gradient(to right, var(--success-green) 100%, var(--border-gray) 100%);
+}
+
+.checkbox-group {
+    margin-top: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 0.2rem;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--african-green);
+}
+
+.link {
+    color: var(--african-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: var(--african-gold);
+    text-decoration: underline;
+}
+
+.register-btn {
+    background: linear-gradient(135deg, var(--african-green), var(--african-black));
+    color: var(--white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(26, 83, 25, 0.3);
+    margin-top: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.register-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.register-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 83, 25, 0.4);
+}
+
+.register-btn:active {
+    transform: translateY(0);
+}
+
+.register-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-loader {
+    position: relative;
+    z-index: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.global-error {
+    background: #fee;
+    border: 2px solid var(--error-red);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+.success-message {
+    background: #e8f5e9;
+    border: 2px solid var(--success-green);
+    color: var(--success-green);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-gray);
+}
+
+.login-link p {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.login-cta {
+    color: var(--african-green);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.login-cta:hover {
+    color: var(--african-gold);
+    text-decoration: underline;
+}
+
+.register-footer {
+    background: var(--light-gray);
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 0 0 20px 20px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .league-logo {
+        font-size: 1.5rem;
+    }
+
+    .welcome-message {
+        font-size: 1.2rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .register-main {
+        padding: 2rem 1.5rem;
+    }
+
+    .register-header {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+
+    .register-container {
+        border-radius: 15px;
+    }
+
+    .register-header {
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem 1rem;
+    }
+
+    .register-main {
+        padding: 1.5rem 1rem;
+    }
+
+    .league-logo {
+        font-size: 1.3rem;
+    }
+
+    .welcome-message {
+        font-size: 1.1rem;
+    }
+
+    .register-btn {
+        font-size: 1rem;
+        padding: 0.9rem 1.5rem;
+    }
+}
+
+/* Animation for form validation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.4s ease-in-out;
+}
