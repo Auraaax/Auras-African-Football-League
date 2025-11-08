@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import User from './models/User.js';
 import Team from './models/Team.js';
+import bcrypt from 'bcryptjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,19 +20,23 @@ const seedData = async () => {
     await Team.deleteMany({});
     console.log('🧹 Cleared existing data');
 
-    // Create admin user (password hash would normally be bcrypt)
+    // Hash demo passwords
+    const adminPass = await bcrypt.hash('admin123', 10);
+    const fedPass = await bcrypt.hash('fed123', 10);
+
+    // Create admin user with real bcrypt hash
     const admin = await User.create({
       name: 'Administrator',
       email: 'admin@aurafootball.com',
-      passwordHash: '$2b$10$dummyhash',
+      passwordHash: adminPass,
       role: 'administrator'
     });
     console.log('👤 Created admin user');
 
     // Create federation users
     await User.create([
-      { name: 'South African FA', email: 'federation@aurafootball.com', passwordHash: '$2b$10$dummyhash', role: 'federation' },
-      { name: 'Nigerian FA', email: 'nigeria@aurafootball.com', passwordHash: '$2b$10$dummyhash', role: 'federation' }
+      { name: 'South African FA', email: 'federation@aurafootball.com', passwordHash: fedPass, role: 'federation' },
+      { name: 'Nigerian FA', email: 'nigeria@aurafootball.com', passwordHash: fedPass, role: 'federation' }
     ]);
     console.log('👥 Created federation users');
 
