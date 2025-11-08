@@ -220,13 +220,60 @@ router.get('/tournament/status', async (req, res) => {
 // GET quarterfinal pairings
 router.get('/tournament/quarterfinals', async (req, res) => {
   try {
-    const teams = await Team.find().limit(8);
+    // Use stable ordering (alphabetical) so bracket doesn't reshuffle mid-round
+    const teams = await Team.find().sort({ teamName: 1 }).limit(8);
     if (teams.length < 8) {
       return res.status(400).json({ error: 'Need 8 teams to create quarterfinals' });
     }
 
-    const pairings = createQuarterfinalPairings(teams);
-    res.json(pairings);
+    // Fetch existing quarterfinal matches to preserve already played games
+    const existingMatches = await Match.find({ round: 'Quarterfinal' })
+      .populate(['teamA','teamB','winner'])
+      .sort({ date: 1 });
+
+    // If none played yet, generate fresh pairings (shuffled for initial randomness)
+    if (existingMatches.length === 0) {
+      const pairings = createQuarterfinalPairings(teams).map(p => ({
+        teamA: p.teamA,
+        teamB: p.teamB,
+        played: false
+      }));
+      return res.json(pairings);
+    }
+
+    // Build set of team ids already involved
+    const usedIds = new Set();
+    const responsePairings = [];
+    for (const m of existingMatches) {
+      usedIds.add(String(m.teamA._id));
+      usedIds.add(String(m.teamB._id));
+      responsePairings.push({
+        teamA: m.teamA,
+        teamB: m.teamB,
+        played: true,
+        matchId: m._id,
+        scoreA: m.scoreA,
+        scoreB: m.scoreB,
+        winner: m.winner ? m.winner.teamName : (m.scoreA === m.scoreB ? 'Draw' : (m.scoreA > m.scoreB ? m.teamA.teamName : m.teamB.teamName)),
+        goals: m.goals,
+        commentary: m.commentary,
+        resultType: m.resultType
+      });
+    }
+
+    // Remaining unpaired teams become pending matches (pair sequentially)
+    const remaining = teams.filter(t => !usedIds.has(String(t._id)));
+    for (let i = 0; i < remaining.length; i += 2) {
+      if (remaining[i+1]) {
+        responsePairings.push({
+          teamA: remaining[i],
+          teamB: remaining[i+1],
+          played: false
+        });
+      }
+    }
+
+    res.json(responsePairings);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create pairings', details: err.message });
   }
@@ -239,17 +286,41 @@ router.get('/tournament/semifinals', async (req, res) => {
       .populate(['teamA', 'teamB', 'winner'])
       .sort({ date: 1 });
 
-    if (quarterfinals.length !== 4 || !quarterfinals.every(m => m.winner)) {
-      return res.status(400).json({ error: 'All quarterfinals must be completed first' });
+    // If not all four played yet, return empty pairings (frontend will wait)
+    if (quarterfinals.length < 4 || !quarterfinals.every(m => m.winner)) {
+      return res.json([]);
     }
 
-    // Pair winners: QF1 winner vs QF2 winner, QF3 winner vs QF4 winner
-    const pairings = [
-      { teamA: quarterfinals[0].winner, teamB: quarterfinals[1].winner },
-      { teamA: quarterfinals[2].winner, teamB: quarterfinals[3].winner }
+    const semifinals = await Match.find({ round: 'Semifinal' })
+      .populate(['teamA','teamB','winner'])
+      .sort({ date: 1 });
+
+    // Construct bracket slots whether played or pending
+    const sfSlots = [
+      { slot: 'SF1', teamA: quarterfinals[0].winner, teamB: quarterfinals[1].winner },
+      { slot: 'SF2', teamA: quarterfinals[2].winner, teamB: quarterfinals[3].winner }
     ];
 
-    res.json(pairings);
+    // Overlay played data
+    for (const m of semifinals) {
+      const slot = sfSlots.find(s => (
+        String(s.teamA._id) === String(m.teamA._id) && String(s.teamB._id) === String(m.teamB._id)
+      ) || (
+        String(s.teamA._id) === String(m.teamB._id) && String(s.teamB._id) === String(m.teamA._id)
+      ));
+      if (slot) {
+        slot.played = true;
+        slot.matchId = m._id;
+        slot.scoreA = m.scoreA;
+        slot.scoreB = m.scoreB;
+        slot.winner = m.winner ? m.winner.teamName : (m.scoreA === m.scoreB ? 'Draw' : (m.scoreA > m.scoreB ? m.teamA.teamName : m.teamB.teamName));
+        slot.goals = m.goals;
+        slot.commentary = m.commentary;
+        slot.resultType = m.resultType;
+      }
+    }
+
+    res.json(sfSlots.map(s => ({ ...s, played: !!s.played })));
   } catch (err) {
     res.status(500).json({ error: 'Failed to create semifinal pairings', details: err.message });
   }
@@ -262,14 +333,34 @@ router.get('/tournament/final', async (req, res) => {
       .populate(['teamA', 'teamB', 'winner'])
       .sort({ date: 1 });
 
-    if (semifinals.length !== 2 || !semifinals.every(m => m.winner)) {
-      return res.status(400).json({ error: 'Both semifinals must be completed first' });
+    // If semifinal winners not ready yet, return empty so frontend waits
+    if (semifinals.length < 2 || !semifinals.every(m => m.winner)) {
+      return res.json(null);
     }
+
+    const finalMatches = await Match.find({ round: 'Final' })
+      .populate(['teamA','teamB','winner'])
+      .sort({ date: 1 });
 
     const pairing = {
       teamA: semifinals[0].winner,
       teamB: semifinals[1].winner
     };
+
+    // Overlay final result if played
+    if (finalMatches.length > 0) {
+      const fm = finalMatches[0];
+      pairing.played = true;
+      pairing.matchId = fm._id;
+      pairing.scoreA = fm.scoreA;
+      pairing.scoreB = fm.scoreB;
+      pairing.winner = fm.winner ? fm.winner.teamName : (fm.scoreA === fm.scoreB ? 'Draw' : (fm.scoreA > fm.scoreB ? fm.teamA.teamName : fm.teamB.teamName));
+      pairing.goals = fm.goals;
+      pairing.commentary = fm.commentary;
+      pairing.resultType = fm.resultType;
+    } else {
+      pairing.played = false;
+    }
 
     res.json(pairing);
   } catch (err) {

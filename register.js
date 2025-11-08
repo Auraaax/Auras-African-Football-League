@@ -107,34 +107,73 @@ async function handleSubmit(e) {
             },
             body: JSON.stringify(registrationData)
         });
-        
-        const data = await response.json();
-        
+
+        const rawText = await response.text();
+        let data;
+        try {
+            data = rawText ? JSON.parse(rawText) : {};
+        } catch (parseErr) {
+            console.warn('[REGISTER] Non-JSON response received:', rawText);
+            data = { error: 'Unexpected server response. Please retry.' };
+        }
+
+        console.log('[REGISTER] Response status:', response.status);
+
         if (!response.ok) {
-            console.error('[REGISTER] Registration failed:', data.error);
-            showError(data.error || 'Registration failed. Please try again.');
+            // Map common status codes to clearer messages
+            let friendlyMessage = data.error || 'Registration failed. Please try again.';
+            if (response.status === 409) {
+                friendlyMessage = 'Email already registered. Use a different email or login.';
+            } else if (response.status === 400) {
+                friendlyMessage = data.error || 'Invalid input. Please review the form.';
+            } else if (response.status >= 500) {
+                friendlyMessage = 'Server error. Please retry shortly.';
+            }
+            console.error('[REGISTER] Registration failed:', {
+                status: response.status,
+                message: friendlyMessage,
+                serverError: data.error,
+                details: data.details
+            });
+            showError(friendlyMessage);
             setLoadingState(false);
             return;
         }
-        
-        console.log('[REGISTER] Registration successful:', data);
-        
+
+        console.log('[REGISTER] Registration successful payload:', data);
+
+        if (!data.token || !data.user) {
+            console.error('[REGISTER] Missing token/user in success response:', data);
+            showError('Registration succeeded but response incomplete. Please login manually.');
+            setLoadingState(false);
+            return;
+        }
+
         // Show success message
         registerSuccess.classList.remove('hidden');
         registerError.classList.add('hidden');
-        
+
         // Store auth token and user data
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        
+        try {
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+        } catch(storageErr) {
+            console.warn('[REGISTER] Storage error (possibly in private mode):', storageErr);
+        }
+
         // Redirect to federation home after brief delay
         setTimeout(() => {
             window.location.href = 'federation_home.html';
-        }, 1500);
+        }, 1200);
         
     } catch (error) {
-        console.error('[REGISTER] Network error:', error);
-        showError('Network error. Please check your connection and try again.');
+        console.error('[REGISTER] Network/Fetch error:', error);
+        // Provide actionable hints
+        let hint = 'Network error. Check your connection.';
+        if (error.message.includes('Failed to fetch')) {
+            hint = 'Cannot reach server. Ensure it is running on port 3002.';
+        }
+        showError(hint);
         setLoadingState(false);
     }
 }

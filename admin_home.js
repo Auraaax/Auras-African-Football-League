@@ -184,6 +184,7 @@ async function loadTournamentStatus() {
     
     const statusDiv = document.getElementById('tournamentStatus');
     const championBanner = document.getElementById('championBanner');
+    const restartBtn = document.getElementById('restartTournamentBtn');
     
     // Update status message
     statusDiv.innerHTML = `<p style="color:${status.canStart ? '#2a9d8f' : '#e63946'};">${status.message}</p>`;
@@ -222,8 +223,12 @@ async function loadTournamentStatus() {
         championBanner.style.display = 'block';
         confetti();
       }
+      // Only allow restart after completion
+      if (restartBtn) restartBtn.style.display = 'inline-block';
     } else {
       championBanner.style.display = 'none';
+      // Hide restart while tournament still running
+      if (restartBtn) restartBtn.style.display = 'none';
     }
     
     // Load bracket based on tournament stage
@@ -299,62 +304,93 @@ async function getRoundHTML(round, playedCount) {
       return html;
     }
     
-    // Show pairings with action buttons
+    // Show pairings with action buttons (pending and played mixed)
     if (round === 'Quarterfinal') {
       const pairingsRes = await fetch(`${baseURL}/tournament/quarterfinals`);
       const pairings = await pairingsRes.json();
       
       pairings.forEach((p, idx) => {
-        html += `
-          <div class="bracket-match pending">
-            <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
-            <div class="match-actions">
-              <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
-                🎮 Play
-              </button>
-              <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">
-                ⚡ Simulate
-              </button>
+        if (p.played) {
+          html += `
+            <div class="bracket-match completed">
+              <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+              <div class="match-score">${p.scoreA} - ${p.scoreB}</div>
+              <div class="match-winner">Winner: <strong>${p.winner}</strong></div>
+              ${p.resultType && p.resultType !== '90min' ? `<div style="font-size:.85rem;color:#aaa;">(${p.resultType})</div>` : ''}
+              ${p.commentary ? `
+                <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" onclick="showCommentary(\`${(p.commentary||'').replace(/`/g, '\\`')}\`)">View Commentary</button>
+              ` : ''}
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          html += `
+            <div class="bracket-match pending">
+              <div class="match-teams">QF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+              <div class="match-actions">
+                <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">🎮 Play</button>
+                <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Quarterfinal')">⚡ Simulate</button>
+              </div>
+            </div>
+          `;
+        }
       });
     } else if (round === 'Semifinal') {
       const pairingsRes = await fetch(`${baseURL}/tournament/semifinals`);
       const pairings = await pairingsRes.json();
       
       pairings.forEach((p, idx) => {
-        html += `
-          <div class="bracket-match pending">
-            <div class="match-teams">SF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
-            <div class="match-actions">
-              <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">
-                🎮 Play
-              </button>
-              <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">
-                ⚡ Simulate
-              </button>
+        if (p.played) {
+          html += `
+            <div class="bracket-match completed">
+              <div class="match-teams">SF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+              <div class="match-score">${p.scoreA} - ${p.scoreB}</div>
+              <div class="match-winner">Winner: <strong>${p.winner}</strong></div>
+              ${p.resultType && p.resultType !== '90min' ? `<div style="font-size:.85rem;color:#aaa;">(${p.resultType})</div>` : ''}
+              ${p.commentary ? `
+                <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" onclick="showCommentary(\`${(p.commentary||'').replace(/`/g, '\\`')}\`)">View Commentary</button>
+              ` : ''}
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          html += `
+            <div class="bracket-match pending">
+              <div class="match-teams">SF${idx + 1}: ${p.teamA.teamName} vs ${p.teamB.teamName}</div>
+              <div class="match-actions">
+                <button class="play-btn" onclick="playMatch('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">🎮 Play</button>
+                <button class="sim-btn" onclick="quickSimulate('${p.teamA._id}', '${p.teamB._id}', 'Semifinal')">⚡ Simulate</button>
+              </div>
+            </div>
+          `;
+        }
       });
     } else if (round === 'Final') {
       const pairingRes = await fetch(`${baseURL}/tournament/final`);
       const pairing = await pairingRes.json();
+      if (!pairing) return '<p style="text-align:center;">Waiting for semifinal winners...</p>';
       
-      html += `
-        <div class="bracket-match pending final-match">
-          <div class="match-teams">🏆 FINAL: ${pairing.teamA.teamName} vs ${pairing.teamB.teamName}</div>
-          <div class="match-actions">
-            <button class="play-btn" onclick="playMatch('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">
-              🎮 Play Final
-            </button>
-            <button class="sim-btn" onclick="quickSimulate('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">
-              ⚡ Simulate Final
-            </button>
+      if (pairing.played) {
+        html += `
+          <div class="bracket-match completed final-match">
+            <div class="match-teams">🏆 FINAL: ${pairing.teamA.teamName} vs ${pairing.teamB.teamName}</div>
+            <div class="match-score">${pairing.scoreA} - ${pairing.scoreB}</div>
+            <div class="match-winner">Champion: <strong>${pairing.winner}</strong></div>
+            ${pairing.resultType && pairing.resultType !== '90min' ? `<div style=\"font-size:.85rem;color:#aaa;\">(${pairing.resultType})</div>` : ''}
+            ${pairing.commentary ? `
+              <button class="primary" style="margin-top:.5rem;width:100%;font-size:.85rem;" onclick="showCommentary(\`${(pairing.commentary||'').replace(/`/g, '\\`')}\`)">View Commentary</button>
+            ` : ''}
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        html += `
+          <div class="bracket-match pending final-match">
+            <div class="match-teams">🏆 FINAL: ${pairing.teamA.teamName} vs ${pairing.teamB.teamName}</div>
+            <div class="match-actions">
+              <button class="play-btn" onclick="playMatch('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">🎮 Play Final</button>
+              <button class="sim-btn" onclick="quickSimulate('${pairing.teamA._id}', '${pairing.teamB._id}', 'Final')">⚡ Simulate Final</button>
+            </div>
+          </div>
+        `;
+      }
     }
     
     return html;
