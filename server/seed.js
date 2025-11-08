@@ -33,12 +33,8 @@ const seedData = async () => {
     });
     console.log('👤 Created admin user');
 
-    // Create federation users
-    await User.create([
-      { name: 'South African FA', email: 'federation@aurafootball.com', passwordHash: fedPass, role: 'federation' },
-      { name: 'Nigerian FA', email: 'nigeria@aurafootball.com', passwordHash: fedPass, role: 'federation' }
-    ]);
-    console.log('👥 Created federation users');
+    // Skip creating demo federation users in production; federations should register via UI
+    console.log('⏭️ Skipping creation of demo federation users');
 
     // Create 7 predefined teams (8th team must be added by federation)
     await Team.create([
