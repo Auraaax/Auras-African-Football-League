@@ -9,20 +9,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'aafl-demo-secret';
 // POST /api/auth/login
 // Demo-friendly auth:
 // - Visitors: no password required; just provide a name/email (optional)
-// - Admin/Federation: checks by email; accepts default demo passwords
+// - Admin/Federation: checks by email; requires password verification
 router.post('/login', async (req, res) => {
   try {
     const { email, password, role } = req.body || {};
-    const userRole = role || 'visitor';
-
+    
     // Visitor is passwordless
-    if (userRole === 'visitor') {
+    if (role === 'visitor') {
       const safeEmail = email && typeof email === 'string' ? email : 'visitor@aafl.local';
       const name = req.body?.name || 'Visitor';
       const token = jwt.sign({ email: safeEmail, role: 'visitor', name }, JWT_SECRET, { expiresIn: '12h' });
       return res.json({ token, user: { email: safeEmail, role: 'visitor', name } });
     }
 
+    // For admin/federation login
     if (!email || !password) {
       return res.status(400).json({ error: 'email and password are required' });
     }
@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Verify password hash (seed uses dummy hash, new registrations use bcrypt)
+    // Verify password hash
     const valid = await bcrypt.compare(password, user.passwordHash).catch(() => false);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
