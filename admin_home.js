@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:3002/api/admin';
+const baseURL = '/api/admin';
 const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 
 function authHeaders() {

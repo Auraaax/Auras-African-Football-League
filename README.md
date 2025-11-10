@@ -1,3 +1,236 @@
+# Aura's African Football League (AAFL)
+
+A full-stack prototype platform for managing African football federations, teams, and a knockout tournament. Includes secure federation self‑registration, admin match simulation with AI/fallback commentary, and progressive tournament bracket visualization (Quarterfinals → Semifinals → Final → Champion).
+
+---
+## Features
+- Federation Registration (password hashed with bcrypt)
+- Role-based Login (administrator, federation, visitor passwordless)
+- JWT Authentication (12h expiry)
+- Knockout Tournament Engine (auto progression of winners)
+- Match Simulation:
+  - Quick simulate (random scores + penalties if draw)
+  - Play with commentary (OpenAI if API key supplied, otherwise fallback generator)
+- Leaderboard (aggregate results across simulated matches)
+- Administrator Dashboard (stats, teams, matches, bracket, deletion)
+- Dynamic Bracket Rendering (completed vs pending matches clearly separated)
+- Email Notification Hook (nodemailer integration placeholder)
+- Secure Password Storage (bcryptjs)
+- Modular Services (tournamentService, emailService)
+
+---
+## Tech Stack
+| Layer      | Technology |
+|------------|------------|
+| Frontend   | HTML, CSS, Vanilla JS |
+| Backend    | Node.js, Express.js |
+| Database   | MongoDB Atlas (Mongoose ODM) |
+| Auth       | JWT + bcrypt password hashing |
+| Email      | Nodemailer (optional) |
+| AI Commentary | OpenAI API (optional) |
+
+---
+## Repository Structure
+```
+Index.html/            # Repo root (frontend + server folder)
+  index.html           # Landing page
+  register.html/.css/.js
+  login.html/.css/.js
+  admin_home.html/.css/.js
+  federation_home.html/.css/.js
+  visitor_home.html/.css/.js
+  style.css, script.js # Global/home assets
+  server/              # Backend source
+    server.js          # Express entrypoint
+    routes/            # admin, auth, federation, visitor routes
+    models/            # Mongoose models (User, Team, Match, etc.)
+    services/          # Tournament + email services
+    seed.js            # Database seeding (admin + initial teams)
+    .env               # Environment variables (NOT committed)
+```
+
+> NOTE: The git repository root is the `Index.html` folder (historical naming). Consider renaming to `aafl-app/` for production clarity.
+
+---
+## Environment Variables (`server/.env`)
+| Variable        | Required | Description |
+|-----------------|----------|-------------|
+| `MONGODB_URI`   | Yes      | MongoDB connection string |
+| `JWT_SECRET`    | Yes      | Secret for signing JWT tokens |
+| `OPENAI_API_KEY`| No       | Enables AI match commentary |
+| `EMAIL_USER`    | No       | SMTP user for nodemailer |
+| `EMAIL_PASS`    | No       | SMTP password for nodemailer |
+
+Example:
+```
+MONGODB_URI=mongodb+srv://user:pass@cluster-url/dbname
+JWT_SECRET=super_secret_string
+OPENAI_API_KEY=sk-xxx
+EMAIL_USER=example@gmail.com
+EMAIL_PASS=app-specific-password
+```
+
+---
+## Setup & Installation
+```bash
+# Clone repository
+git clone https://github.com/Auraaax/Auras-African-Football-League.git
+cd Auras-African-Football-League/Index.html
+
+# Install backend dependencies
+npm install --prefix server
+
+# (Optional) Install root-level deps if any
+npm install
+
+# Create environment file
+cp server/.env.example server/.env
+# Edit server/.env with real values
+
+# Seed database (creates admin + initial teams, skips federation demos)
+npm run seed --prefix server
+
+# Start server
+npm start --prefix server
+# Server runs on http://localhost:3002
+```
+Open frontend pages directly via http://localhost:3002/ e.g. `/login.html`, `/register.html`.
+
+---
+## Auth Flow
+### Registration (Federation)
+POST `/api/auth/register`
+Payload:
+```
+{
+  "federationName": "Ghana Football Federation",
+  "country": "Ghana",
+  "contactPerson": "Ama Kusi",
+  "email": "federation@example.com",
+  "password": "StrongPass1!"
+}
+```
+Response: `201 Created` with `token` + `user` object.
+
+### Login
+POST `/api/auth/login`
+- visitor: `{ "role":"visitor", "email":"optional", "name":"Fan" }`
+- federation/admin: `{ "email":"...", "password":"...", "role":"federation" }`
+
+Response: `200 OK` with `token` + `user`.
+
+### Token Usage
+Attach token to protected endpoints (future expansion) via header:
+`Authorization: Bearer <token>`
+
+---
+## Tournament Progression
+Knockout bracket logic (single elimination):
+1. Needs 8 teams to start Quarterfinals.
+2. Quarterfinal winners → 2 Semifinal matches.
+3. Semifinal winners → Final.
+4. Final winner → Champion banner + Restart enabled.
+
+Endpoints:
+- `GET /api/admin/tournament/status` – overall stage & counts
+- `GET /api/admin/tournament/quarterfinals` – mixed pending/played QF pairings
+- `GET /api/admin/tournament/semifinals` – pending/played SF slots
+- `GET /api/admin/tournament/final` – pending or completed final pairing
+- `POST /api/admin/tournament/play-match` – AI/fallback simulation with commentary
+- `POST /api/admin/tournament/simulate-match` – quick simulation
+- `POST /api/admin/tournament/restart` – clear matches (only used after champion)
+- `GET /api/admin/tournament/matches/:round` – list matches per round
+
+Match Object (simplified):
+```
+{
+  id, teamA, teamB,
+  scoreA, scoreB,
+  goals:[{ scorer, team, minute }],
+  commentary, resultType,
+  winner, round, date
+}
+```
+
+---
+## Seeding
+`server/seed.js` creates:
+- Administrator user (email: admin@aurafootball.com / password: admin123)
+- 7 initial teams (waiting for federation to add 8th)
+- Skips federation demo accounts (production-safe)
+
+Run again ONLY if you want a clean slate:
+```bash
+npm run seed --prefix server
+```
+(Warning: This wipes existing users & teams.)
+
+---
+## Deployment (Vercel)
+Since frontend & backend live together, you can:
+1. Move `server/` to repo root (optional refactor), OR
+2. Configure Vercel to use a custom build & start:
+   - Build Command: `npm install --prefix server`
+   - Output: (None, run as serverless/Node server)
+   - Start Command (Development): `npm start --prefix server`
+
+For a production API, consider:
+- Converting to serverless functions (split routes) OR
+- Deploying backend separately (Render/Heroku) and pointing frontend to API base URL.
+
+Set Environment Variables in Vercel dashboard matching `.env`.
+
+---
+## Security & Hardening
+- Bcrypt password hashing (salt rounds = 10)
+- JWT expiration (12 hours) – consider refresh tokens for long sessions
+- Validation present on registration; can extend with stricter complexity checks
+- No federation accounts seeded—must self-register
+- Recommend enabling HTTPS & setting `SameSite` attributes when converting token to cookie-based auth
+
+Future Improvements:
+- Rate limiting (express-rate-limit) for auth endpoints
+- Email verification & password reset flows
+- Centralized error format & logging (winston/pino)
+- Role-based authorization middleware
+
+---
+## Development Scripts
+| Script | Command | Description |
+|--------|---------|-------------|
+| Start  | `npm start --prefix server` | Run production server locally |
+| Dev    | `npm run dev --prefix server` | Nodemon auto-restart during development |
+| Seed   | `npm run seed --prefix server` | Reset & seed database |
+
+---
+## Troubleshooting
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| 404 on /api/auth/register | Server not running or wrong base URL | Start server, use `http://localhost:3002` |
+| Login fails after registration | Mismatched password | Re-enter correct password (bcrypt hash stored) |
+| Final doesn’t appear | Semifinals not both completed | Play remaining SF matches |
+| Restart shows too early | Cached JS | Hard refresh (Cmd+Shift+R) |
+| OpenAI errors | Missing/invalid API key | Set `OPENAI_API_KEY` or rely on fallback commentary |
+
+---
+## License
+MIT © 2025 Aura's African Football League (Prototype)
+
+---
+## Contributing
+1. Fork repo
+2. Create feature branch: `git checkout -b feature/xyz`
+3. Commit changes: `git commit -m "Add xyz"`
+4. Push: `git push origin feature/xyz`
+5. Open Pull Request
+
+---
+## Acknowledgements
+- African football inspiration
+- OpenAI for optional commentary generation
+- MongoDB Atlas for managed database
+
+Enjoy building the league! ⚽🌍
 Aura’s African Football League
 1. Introduction
 The Aura’s African Football League system is a full-stack web application that simulates a continental football tournament for African federations. It allows each country to register its national team, manage its players, and participate in a simulated football competition managed by an administrator. The system also provides visitors with access to tournament information, statistics, and analytics.
