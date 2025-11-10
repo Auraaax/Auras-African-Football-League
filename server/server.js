@@ -36,7 +36,7 @@ app.use('/api/federation', federationRoutes);
 const PORT = process.env.PORT || 3002;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
+if (!MONGODB_URI && process.env.VERCEL !== '1') {
   console.error('Missing MONGODB_URI. Create server/.env with MONGODB_URI=...');
   process.exit(1);
 }
@@ -46,6 +46,10 @@ let isConnected = false;
 
 const connectDB = async () => {
   if (isConnected) return;
+  
+  if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI environment variable is not set');
+  }
   
   try {
     await mongoose.connect(MONGODB_URI);
@@ -59,8 +63,13 @@ const connectDB = async () => {
 
 // For Vercel serverless - ensure DB connection before handling requests
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection failed:', err.message);
+    res.status(500).json({ error: 'Database connection failed', details: err.message });
+  }
 });
 
 // Only start server if not in serverless environment
