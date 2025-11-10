@@ -42,12 +42,36 @@ if (!MONGODB_URI) {
 }
 
 // MongoDB connection
-mongoose.connect(MONGODB_URI)
-  .then(() => {
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+  
+  try {
+    await mongoose.connect(MONGODB_URI);
+    isConnected = true;
     console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => console.log(`🚀 Admin server running on http://localhost:${PORT}`));
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
+    throw err;
+  }
+};
+
+// For Vercel serverless - ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// Only start server if not in serverless environment
+if (process.env.VERCEL !== '1') {
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`🚀 Admin server running on http://localhost:${PORT}`));
+  }).catch(err => {
+    console.error('Failed to start server:', err);
     process.exit(1);
   });
+}
+
+// Export for Vercel serverless
+export default app;
